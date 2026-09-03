@@ -2,13 +2,14 @@ import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/database';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gxfeevstjlepdnyfjzkh.supabase.co';
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
+const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseServiceRoleKey = rawServiceKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy';
 
 export const isSupabaseConfigured = Boolean(
-  supabaseUrl &&
-  supabaseServiceRoleKey &&
-  !supabaseUrl.includes('placeholder')
+  rawServiceKey &&
+  rawServiceKey !== 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy' &&
+  !rawServiceKey.includes('placeholder') &&
+  !rawServiceKey.includes('your-supabase')
 );
 
 /**
