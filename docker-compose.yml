@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # Supabase PostgreSQL Database (Local Dev)
+  postgres:
+    image: postgres:15-alpine
+    container_name: flexgear_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: flexgear
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./supabase/seed.sql:/docker-entrypoint-initdb.d/seed.sql
+
+  # Node.js + Express TypeScript API Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: flexgear_backend
+    restart: always
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      DATABASE_URL: postgres://postgres:postgrespassword@postgres:5432/flexgear
+      CUSTOMER_WEB_URL: http://localhost:3000
+      ADMIN_WEB_URL: http://localhost:3001
+      JWT_SECRET: flexgear_super_secure_jwt_token_2026
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+
+  # Customer Web Next.js 14 App
+  customer-web:
+    build:
+      context: ./customer-web
+      dockerfile: Dockerfile
+    container_name: flexgear_customer_web
+    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5000/api
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  # Admin Web Next.js 14 Operations Portal
+  admin-web:
+    build:
+      context: ./admin-web
+      dockerfile: Dockerfile
+    container_name: flexgear_admin_web
+    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5000/api
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
