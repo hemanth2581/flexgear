@@ -144,16 +144,16 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
   const years = [yearNumber, yearNumber + 1];
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 animate-in zoom-in-95 duration-200 max-h-[92vh] flex flex-col"
+        className="relative w-full max-w-2xl bg-cinema-card text-cinema-text rounded-3xl shadow-cinema-lg overflow-hidden border border-cinema-border animate-in zoom-in-95 duration-200 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-lenstiger text-white px-5 py-3.5 flex items-center justify-between shrink-0">
+        <div className="bg-cinema-surface border-b border-cinema-border px-5 py-3.5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5 text-gold" />
-            <h4 className="text-lg font-bold text-white headingbold">Price Calendar</h4>
+            <CalendarIcon className="w-5 h-5 text-accent" />
+            <h4 className="text-lg font-bold text-cinema-text headingbold">Live Rate &amp; Availability Calendar</h4>
           </div>
 
           <div className="flex items-center gap-2">
@@ -161,10 +161,10 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
             <select
               value={currentMonthDate.getMonth()}
               onChange={(e) => handleMonthChange(Number(e.target.value))}
-              className="bg-white/15 text-white border border-white/30 rounded-lg text-xs font-semibold px-2.5 py-1.5 focus:outline-none focus:bg-white/25 cursor-pointer"
+              className="bg-cinema-elevated text-cinema-text border border-cinema-border rounded-lg text-xs font-semibold px-2.5 py-1.5 focus:outline-none focus:border-accent cursor-pointer"
             >
               {months.map((m, idx) => (
-                <option key={m} value={idx} className="text-gray-900 bg-white">
+                <option key={m} value={idx} className="text-cinema-text bg-cinema-card">
                   {m}
                 </option>
               ))}
@@ -174,10 +174,10 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
             <select
               value={yearNumber}
               onChange={(e) => handleYearChange(Number(e.target.value))}
-              className="bg-white/15 text-white border border-white/30 rounded-lg text-xs font-semibold px-2.5 py-1.5 focus:outline-none focus:bg-white/25 cursor-pointer"
+              className="bg-cinema-elevated text-cinema-text border border-cinema-border rounded-lg text-xs font-semibold px-2.5 py-1.5 focus:outline-none focus:border-accent cursor-pointer"
             >
               {years.map((y) => (
-                <option key={y} value={y} className="text-gray-900 bg-white">
+                <option key={y} value={y} className="text-cinema-text bg-cinema-card">
                   {y}
                 </option>
               ))}
@@ -185,7 +185,7 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
 
             <button
               onClick={onClose}
-              className="p-1 text-white/80 hover:text-white hover:bg-white/20 rounded-full transition ml-2"
+              className="p-1 text-cinema-muted hover:text-cinema-text hover:bg-cinema-elevated rounded-full transition ml-2 cursor-pointer"
               aria-label="Close"
             >
               <X className="w-5 h-5" />
@@ -194,9 +194,9 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
         </div>
 
         {/* Product Snapshot */}
-        <div className="bg-gray-50 border-b border-gray-200 px-5 py-2.5 flex items-center justify-between shrink-0">
+        <div className="bg-cinema-surface/60 border-b border-cinema-border px-5 py-2.5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="relative w-10 h-10 rounded-lg bg-white border border-gray-200 overflow-hidden shrink-0">
+            <div className="relative w-10 h-10 rounded-lg bg-cinema-elevated border border-cinema-border overflow-hidden shrink-0">
               <Image
                 src={equipment.image_url || '/placeholder.jpg'}
                 alt={equipment.name}
@@ -205,40 +205,40 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
               />
             </div>
             <div>
-              <h5 className="text-sm font-bold text-gray-900 leading-snug line-clamp-1">
+              <h5 className="text-sm font-bold text-cinema-text leading-snug line-clamp-1">
                 {equipment.name}
               </h5>
-              <div className="text-xs text-gray-500">
-                Location Hub: <span className="font-semibold text-lenstiger">{selectedCityData.name}</span>
+              <div className="text-xs text-cinema-muted">
+                Location Hub: <span className="font-semibold text-accent">{selectedCityData.name}</span>
               </div>
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-xs text-gray-500">Starting from</div>
-            <div className="text-sm font-extrabold text-lenstiger">
+            <div className="text-xs text-cinema-muted">Starting from</div>
+            <div className="text-sm font-black text-accent font-heading">
               {formatCurrency(baseDailyPrice)}/day
             </div>
           </div>
         </div>
 
         {/* Calendar Grid Body */}
-        <div className="p-4 sm:p-5 overflow-y-auto flex-1">
-          <div className="mb-2 text-center text-xs text-gray-500 flex items-center justify-center gap-4">
+        <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
+          <div className="text-center text-xs text-cinema-muted flex items-center justify-center gap-4">
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-lenstiger inline-block" /> Selected Dates
+              <span className="w-3 h-3 rounded-full bg-accent inline-block" /> Selected Dates
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full bg-gray-200 inline-block" /> Available
+              <span className="w-3 h-3 rounded-full bg-cinema-elevated border border-cinema-border inline-block" /> Available
             </span>
-            <span className="flex items-center gap-1 text-gray-400">
-              <span className="w-3 h-3 rounded-full bg-gray-100 inline-block" /> Past / Unavailable
+            <span className="flex items-center gap-1 text-cinema-muted/50">
+              <span className="w-3 h-3 rounded-full bg-cinema-bg inline-block" /> Past / Unavailable
             </span>
           </div>
 
           <table className="w-full text-center border-collapse">
             <thead>
-              <tr className="border-b border-gray-200 text-xs font-bold text-gray-600">
+              <tr className="border-b border-cinema-border text-xs font-bold text-cinema-muted">
                 {daysOfWeek.map((d) => (
                   <th key={d} className="py-2 px-1">
                     {d}
@@ -249,13 +249,13 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
             <tbody>
               {Array.from({ length: Math.ceil((daysInMonth.length + startDayOfWeek) / 7) }).map(
                 (_, weekIdx) => (
-                  <tr key={weekIdx} className="border-b border-gray-100">
+                  <tr key={weekIdx} className="border-b border-cinema-border/40">
                     {Array.from({ length: 7 }).map((_, dayOfWeekIdx) => {
                       const dayNumber = weekIdx * 7 + dayOfWeekIdx - startDayOfWeek + 1;
                       const isValidDay = dayNumber > 0 && dayNumber <= daysInMonth.length;
 
                       if (!isValidDay) {
-                        return <td key={dayOfWeekIdx} className="py-2.5 px-1 bg-gray-50/50" />;
+                        return <td key={dayOfWeekIdx} className="py-2.5 px-1 bg-cinema-surface/20" />;
                       }
 
                       const dateObj = new Date(yearNumber, currentMonthDate.getMonth(), dayNumber);
@@ -267,18 +267,22 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
                         <td
                           key={dayOfWeekIdx}
                           onClick={() => !isPastDate && handleDateClick(dateObj)}
-                          className={`calendar-day py-2 px-1 rounded-lg border border-transparent ${
-                            isPastDate ? 'disabled-day' : ''
-                          } ${isSelected ? 'selected-day' : ''}`}
+                          className={`py-2 px-1 rounded-xl border border-transparent transition cursor-pointer ${
+                            isPastDate
+                              ? 'opacity-30 cursor-not-allowed bg-cinema-bg/50 text-cinema-muted'
+                              : isSelected
+                              ? 'bg-accent text-cinema-bg font-black shadow-cinema-accent'
+                              : 'hover:bg-cinema-elevated hover:border-accent/40 text-cinema-text'
+                          }`}
                         >
                           <div className="font-bold text-xs sm:text-sm">{dayNumber}</div>
                           <div
                             className={`text-[11px] font-bold ${
                               isSelected
-                                ? 'text-white'
+                                ? 'text-cinema-bg font-black'
                                 : isPastDate
-                                ? 'text-gray-400'
-                                : 'text-lenstiger'
+                                ? 'text-cinema-muted'
+                                : 'text-accent'
                             }`}
                           >
                             ₹{baseDailyPrice.toLocaleString()}
@@ -286,7 +290,7 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
                           {!isPastDate && (
                             <div
                               className={`text-[9px] line-through ${
-                                isSelected ? 'text-white/80' : 'text-gray-400'
+                                isSelected ? 'text-cinema-bg/70' : 'text-cinema-muted/60'
                               }`}
                             >
                               ₹{originalDailyPrice.toLocaleString()}
@@ -302,10 +306,10 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
           </table>
 
           {/* Selected Summary Card */}
-          <div className="mt-4 p-3.5 rounded-xl bg-gray-50 border border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="p-3.5 rounded-2xl bg-cinema-elevated border border-cinema-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
             <div>
-              <span className="text-gray-500 font-medium">Selected Duration:</span>{' '}
-              <strong className="text-gray-900">
+              <span className="text-cinema-muted font-medium">Selected Duration:</span>{' '}
+              <strong className="text-cinema-text">
                 {startDate ? format(startDate, 'dd MMM yyyy') : 'Select Start'}{' '}
                 {endDate ? `→ ${format(endDate, 'dd MMM yyyy')}` : ''} ({rentalDays} Day{rentalDays > 1 ? 's' : ''})
               </strong>
@@ -313,8 +317,8 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
 
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <span className="text-gray-500">Estimated Total: </span>
-                <span className="text-base font-black text-lenstiger">
+                <span className="text-cinema-muted">Estimated Total: </span>
+                <span className="text-base font-black text-accent font-heading">
                   {formatCurrency(totalRentalCost)}
                 </span>
               </div>
@@ -323,25 +327,25 @@ export function PriceCalendarModal({ equipment, isOpen, onClose }: PriceCalendar
         </div>
 
         {/* Modal Footer Actions */}
-        <div className="bg-gray-100/90 border-t border-gray-200 px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-1.5 text-xs text-gray-600">
-            <ShieldCheck className="w-4 h-4 text-lenstiger" />
-            <span>100% Tested Gear & Verified Sensors</span>
+        <div className="bg-cinema-surface border-t border-cinema-border px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 text-xs text-cinema-muted">
+            <ShieldCheck className="w-4 h-4 text-accent" />
+            <span>100% Tested Cinema Optics &amp; Calibrated Sensors</span>
           </div>
 
           <div className="flex items-center gap-2.5">
-            {/* WhatsApp to Buy / Inquire */}
+            {/* WhatsApp to Rent */}
             <button
               onClick={handleWhatsApp}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-whatsapp hover:bg-whatsapp-hover text-white font-bold text-xs shadow-sm transition active:scale-95"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-whatsapp hover:bg-whatsapp-hover text-white font-bold text-xs shadow-sm transition active:scale-95 cursor-pointer"
             >
-              <span className="text-sm font-black">WhatsApp To Rent</span>
+              <span>WhatsApp To Rent</span>
             </button>
 
             {/* Rent Now / Add to Cart */}
             <button
               onClick={handleAddToCart}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gold hover:bg-gold-hover text-gray-950 font-black text-xs shadow-md transition active:scale-95"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-cinema-bg font-black text-xs shadow-cinema-sm transition active:scale-95 cursor-pointer"
             >
               <ShoppingCart className="w-4 h-4" />
               <span>{addedSuccess ? 'Added to Cart!' : 'Rent Now'}</span>

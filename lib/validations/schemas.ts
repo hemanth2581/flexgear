@@ -68,8 +68,8 @@ export const EquipmentFilterSchema = z.object({
 });
 
 export const ReviewCreateSchema = z.object({
-  equipmentId: z.string().uuid('Invalid equipment ID'),
-  rentalOrderId: z.string().uuid('Invalid rental order ID').optional(),
+  equipmentId: z.string().min(1, 'Invalid equipment ID'),
+  rentalOrderId: z.string().min(1, 'Invalid rental order ID').optional(),
   rating: z.number().int().min(1).max(5, 'Rating must be between 1 and 5'),
   comment: z.string().trim().min(5, 'Comment must be at least 5 characters'),
 });

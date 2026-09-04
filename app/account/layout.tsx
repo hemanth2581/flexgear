@@ -14,6 +14,7 @@ export default function AccountLayout({ children }: AccountLayoutProps) {
 
   const navItems = [
     { name: 'Dashboard Overview', href: '/account', icon: LayoutDashboard },
+    { name: 'Zero-Deposit KYC', href: '/account/kyc', icon: User },
     { name: 'My Rentals & Invoices', href: '/account/rentals', icon: Film },
     { name: 'Saved Wishlist', href: '/account/wishlist', icon: Heart },
     { name: 'Delivery Addresses', href: '/account/addresses', icon: MapPin },

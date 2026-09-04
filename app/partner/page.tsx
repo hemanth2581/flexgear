@@ -14,9 +14,15 @@ export default function PartnerPage() {
     name: '',
     phone: '',
     email: '',
-    city: selectedCity,
+    city: selectedCity || 'Chennai',
     gearDetails: '',
   });
+
+  React.useEffect(() => {
+    if (selectedCity) {
+      setFormData((prev) => ({ ...prev, city: prev.city || selectedCity }));
+    }
+  }, [selectedCity]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

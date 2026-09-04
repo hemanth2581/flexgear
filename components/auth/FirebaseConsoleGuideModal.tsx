@@ -12,6 +12,7 @@ import {
   Copy,
   Sparkles,
   HelpCircle,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
@@ -32,15 +33,15 @@ export function FirebaseConsoleGuideModal({ isOpen, onClose }: FirebaseConsoleGu
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl border border-gray-200 text-gray-900 p-6 sm:p-8 space-y-6"
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-cinema-surface rounded-3xl shadow-cinema-xl border border-cinema-border text-cinema-text p-6 sm:p-8 space-y-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
+          className="absolute top-5 right-5 p-2 rounded-full text-cinema-muted hover:text-cinema-text hover:bg-cinema-elevated transition cursor-pointer"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
@@ -48,21 +49,21 @@ export function FirebaseConsoleGuideModal({ isOpen, onClose }: FirebaseConsoleGu
 
         {/* Header */}
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-amber-500/10 text-amber-600 rounded-2xl shrink-0">
+          <div className="p-3 bg-accent/15 text-accent border border-accent/30 rounded-2xl shrink-0">
             <Smartphone className="w-7 h-7" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-800">
-                Setup Guide
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-accent/20 text-accent border border-accent/30">
+                Setup Checklist
               </span>
-              <span className="text-xs font-semibold text-gray-400">Firebase Console</span>
+              <span className="text-xs font-semibold text-cinema-muted">Firebase Project: flex-gear-9d899</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-gray-900 headingbold mt-1">
-              How to Configure Firebase Phone OTP
+            <h2 className="text-xl sm:text-2xl font-black text-cinema-text font-heading mt-1">
+              Firebase Phone OTP &amp; SMS Configuration
             </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Follow these simple steps in the Firebase Console to enable phone authentication and instant testing.
+            <p className="text-xs text-cinema-muted mt-0.5">
+              Follow these 4 essential steps in the Firebase Console to enable live SMS and instant testing.
             </p>
           </div>
         </div>
@@ -70,120 +71,135 @@ export function FirebaseConsoleGuideModal({ isOpen, onClose }: FirebaseConsoleGu
         {/* Step-by-Step Instructions */}
         <div className="space-y-4">
           {/* Step 1: Enable Phone Provider */}
-          <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-2">
+          <div className="p-4 rounded-2xl bg-cinema-elevated border border-cinema-border space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-lenstiger text-white font-bold text-xs">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent text-cinema-bg font-bold text-xs">
                   1
                 </span>
-                <h3 className="text-sm font-bold text-gray-900">Enable Phone Sign-in Provider</h3>
+                <h3 className="text-sm font-bold text-cinema-text">1. Enable Phone Sign-in Method</h3>
               </div>
               <a
-                href="https://console.firebase.google.com/project/_/authentication/providers"
+                href="https://console.firebase.google.com/project/flex-gear-9d899/authentication/providers"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-lenstiger hover:underline font-semibold flex items-center gap-1"
+                className="text-xs text-accent hover:underline font-semibold flex items-center gap-1"
               >
                 <span>Open Firebase Console</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
-            <p className="text-xs text-gray-600 pl-8">
-              In Firebase Console, navigate to <strong>Build &gt; Authentication &gt; Sign-in method</strong> tab. Click on <strong>Phone</strong> and toggle <strong>Enable</strong>.
+            <p className="text-xs text-cinema-muted pl-8">
+              Navigate to <strong>Authentication &gt; Sign-in method</strong> tab. Click on <strong>Phone</strong> and verify that <strong>Enable</strong> is toggled ON.
             </p>
           </div>
 
-          {/* Step 2: Add Test Phone Numbers */}
-          <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-500 text-white font-bold text-xs">
-                2
-              </span>
-              <h3 className="text-sm font-bold text-gray-900">
-                Add Test Phone Numbers (Zero-Cost &amp; Instant)
-              </h3>
+          {/* Step 2: SMS Region Policy (CRITICAL FIX) */}
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-amber-500 text-cinema-bg font-bold text-xs">
+                  2
+                </span>
+                <h3 className="text-sm font-bold text-cinema-text flex items-center gap-1.5">
+                  <span>2. Enable SMS Region Policy (India +91)</span>
+                  <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-mono">
+                    Required for +91 SMS
+                  </span>
+                </h3>
+              </div>
+              <a
+                href="https://console.firebase.google.com/project/flex-gear-9d899/authentication/settings"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-amber-400 hover:underline font-semibold flex items-center gap-1"
+              >
+                <span>Settings</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
             </div>
-            <p className="text-xs text-gray-600 pl-8">
-              Under the Phone provider settings in Firebase Console, expand <strong>&quot;Phone numbers for testing&quot;</strong>. You can add test credentials so you never burn SMS quota during development:
+            <p className="text-xs text-cinema-muted pl-8">
+              In <strong>Authentication &gt; Settings &gt; SMS Region Policy</strong>, click <strong>Edit</strong> and ensure <strong>India (+91)</strong> is in the allowed countries list (or select &quot;Allow all regions&quot;).
             </p>
-            <div className="pl-8 grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div className="p-3 bg-white rounded-xl border border-amber-200 flex items-center justify-between">
-                <div>
-                  <div className="text-[10px] uppercase font-bold text-gray-400">Phone Number</div>
-                  <div className="text-xs font-mono font-bold text-gray-900">+91 98765 43210</div>
-                </div>
-                <button
-                  onClick={() => copyToClipboard('+919876543210', 'Test Phone')}
-                  className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
-                >
-                  <Copy className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="p-3 bg-white rounded-xl border border-amber-200 flex items-center justify-between">
-                <div>
-                  <div className="text-[10px] uppercase font-bold text-gray-400">Test OTP Code</div>
-                  <div className="text-xs font-mono font-bold text-amber-600">123456</div>
-                </div>
-                <button
-                  onClick={() => copyToClipboard('123456', 'Test OTP')}
-                  className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
-                >
-                  <Copy className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Step 3: Authorized Domains */}
-          <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-lenstiger text-white font-bold text-xs">
-                3
-              </span>
-              <h3 className="text-sm font-bold text-gray-900">Check Authorized Domains</h3>
+          <div className="p-4 rounded-2xl bg-cinema-elevated border border-cinema-border space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent text-cinema-bg font-bold text-xs">
+                  3
+                </span>
+                <h3 className="text-sm font-bold text-cinema-text">3. Add Authorized Production Domain</h3>
+              </div>
+              <button
+                onClick={() => copyToClipboard('flexgear-rental.vercel.app', 'Vercel Domain')}
+                className="text-xs text-accent hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+              >
+                <span>Copy Domain</span>
+                <Copy className="w-3 h-3" />
+              </button>
             </div>
-            <p className="text-xs text-gray-600 pl-8">
-              In <strong>Authentication &gt; Settings &gt; Authorized domains</strong>, verify that <code className="bg-gray-200 px-1 py-0.5 rounded text-[11px] font-mono">localhost</code> is listed (it is added by default).
+            <p className="text-xs text-cinema-muted pl-8">
+              In <strong>Authentication &gt; Settings &gt; Authorized domains</strong>, click <strong>Add domain</strong> and enter: <code className="bg-cinema-bg text-accent px-1.5 py-0.5 rounded text-[11px] font-mono border border-cinema-border">flexgear-rental.vercel.app</code>.
             </p>
           </div>
 
-          {/* Step 4: Environment Variables */}
-          <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 space-y-2">
+          {/* Step 4: Add Test Phone Numbers */}
+          <div className="p-4 rounded-2xl bg-cinema-elevated border border-cinema-border space-y-3">
             <div className="flex items-center gap-2">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-lenstiger text-white font-bold text-xs">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-accent text-cinema-bg font-bold text-xs">
                 4
               </span>
-              <h3 className="text-sm font-bold text-gray-900">Add Web App Keys in .env.local</h3>
+              <h3 className="text-sm font-bold text-cinema-text">
+                4. Test Phone Numbers (Zero-Cost &amp; Instant)
+              </h3>
             </div>
-            <p className="text-xs text-gray-600 pl-8">
-              Go to <strong>Project Settings (gear icon) &gt; General &gt; Your apps &gt; Web app (&lt;/&gt;)</strong> and paste into <code className="bg-gray-200 px-1 py-0.5 rounded text-[11px] font-mono">.env.local</code>:
+            <p className="text-xs text-cinema-muted pl-8">
+              Under <strong>Authentication &gt; Sign-in method &gt; Phone &gt; &quot;Phone numbers for testing&quot;</strong>, add test credentials to test instantly without consuming SMS quotas:
             </p>
-            <div className="pl-8">
-              <pre className="p-3 bg-gray-900 text-gray-100 text-[11px] font-mono rounded-xl overflow-x-auto">
-{`NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSy...
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=1234567890
-NEXT_PUBLIC_FIREBASE_APP_ID=1:123456:web:abcdef`}
-              </pre>
+            <div className="pl-8 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="p-3 bg-cinema-bg rounded-xl border border-cinema-border flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-cinema-muted">Test Phone Number</div>
+                  <div className="text-xs font-mono font-bold text-cinema-text">+91 98765 43210</div>
+                </div>
+                <button
+                  onClick={() => copyToClipboard('+919876543210', 'Test Phone')}
+                  className="p-1.5 text-cinema-muted hover:text-cinema-text hover:bg-cinema-elevated rounded-lg cursor-pointer"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <div className="p-3 bg-cinema-bg rounded-xl border border-cinema-border flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-cinema-muted">Fixed Test OTP</div>
+                  <div className="text-xs font-mono font-bold text-accent">123456</div>
+                </div>
+                <button
+                  onClick={() => copyToClipboard('123456', 'Test OTP')}
+                  className="p-1.5 text-cinema-muted hover:text-cinema-text hover:bg-cinema-elevated rounded-lg cursor-pointer"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Works with both live SMS &amp; Test Numbers</span>
+        <div className="flex items-center justify-between pt-2 border-t border-cinema-border">
+          <div className="flex items-center gap-1.5 text-xs text-cinema-muted">
+            <CheckCircle2 className="w-4 h-4 text-semantic-success" />
+            <span>Works with both live SMS &amp; instant test numbers</span>
           </div>
           <Button
             type="button"
             onClick={onClose}
-            className="rounded-xl bg-lenstiger hover:bg-lenstiger-dark text-white font-bold text-xs px-5"
+            className="rounded-xl bg-accent hover:bg-accent-hover text-cinema-bg font-bold text-xs px-5 shadow-cinema-accent"
           >
-            Got It
+            Done
           </Button>
         </div>
       </div>

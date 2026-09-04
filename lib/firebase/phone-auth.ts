@@ -103,33 +103,46 @@ export function getFirebaseErrorMessage(error: any): string {
   const code = error?.code || '';
   const message = error?.message || '';
 
+  // 1. Check for SMS Region Policy restriction in the error message or payload
+  if (
+    message.includes('SMS unable to be sent until this region enabled') ||
+    message.includes('SMS Region Policy') ||
+    message.includes('region enabled by the app developer')
+  ) {
+    return 'Firebase SMS Region Policy: SMS delivery to India (+91) / this region is not enabled yet. In Firebase Console, go to Authentication > Settings > SMS Region Policy and enable India (+91) or your region.';
+  }
+
   switch (code) {
     case 'auth/invalid-phone-number':
-      return 'The phone number is invalid. Please check the country code and digits.';
+      return 'The phone number is invalid. Please check the country code (+91) and 10-digit number.';
     case 'auth/missing-phone-number':
-      return 'Please provide a valid phone number.';
+      return 'Please provide a valid 10-digit phone number.';
     case 'auth/quota-exceeded':
-      return 'SMS quota exceeded for this Firebase project. Try using a test phone number configured in Firebase Console.';
+      return 'Firebase SMS quota reached. You can also configure instant test phone numbers in Firebase Console > Sign-in method > Phone.';
     case 'auth/captcha-check-failed':
-      return 'reCAPTCHA verification failed. Please try again or refresh the page.';
+      return 'reCAPTCHA verification failed. Please refresh the page and try again.';
     case 'auth/invalid-verification-code':
       return 'Invalid OTP verification code. Please check the 6-digit code and try again.';
     case 'auth/code-expired':
-      return 'The OTP has expired. Please request a new verification code.';
+      return 'The OTP verification code has expired. Please request a new code.';
     case 'auth/too-many-requests':
-      return 'Too many attempts. Access to this account has been temporarily disabled. Please try again later.';
+      return 'Too many attempts. Access from this device has been temporarily rate-limited. Please wait a moment and try again.';
     case 'auth/user-disabled':
       return 'This user account has been disabled by the administrator.';
     case 'auth/operation-not-allowed':
-      return 'Phone authentication is not enabled in the Firebase Console. Go to Authentication > Sign-in method > Phone to enable it.';
+      if (message.includes('region') || message.includes('SMS')) {
+        return 'Firebase SMS Region Policy: SMS delivery to India (+91) is not enabled. In Firebase Console, go to Authentication > Settings > SMS Region Policy and add India (+91).';
+      }
+      return 'Phone authentication or SMS region is not enabled in Firebase Console. Go to Authentication > Sign-in method > Phone and verify Phone is enabled and SMS Region Policy allows India (+91).';
     case 'auth/network-request-failed':
-      return 'Network error. Please check your internet connection.';
+      return 'Network error. Please check your internet connection and try again.';
     case 'auth/app-not-authorized':
-      return 'Domain not authorized in Firebase Console. Add your domain (e.g. localhost) in Firebase Auth > Settings > Authorized domains.';
+    case 'auth/unauthorized-domain':
+      return 'Domain not authorized in Firebase Console. Add "flexgear-rental.vercel.app" in Firebase Console > Authentication > Settings > Authorized domains.';
     default:
       if (message.includes('reCAPTCHA')) {
-        return 'reCAPTCHA check failed. Please refresh and try again.';
+        return 'reCAPTCHA security check failed. Please refresh and try again.';
       }
-      return message || 'An error occurred during authentication. Please try again.';
+      return message || 'An unexpected authentication error occurred. Please try again.';
   }
 }

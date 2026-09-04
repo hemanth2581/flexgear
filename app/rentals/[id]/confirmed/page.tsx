@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { InvoiceService } from '@/lib/services/invoice.service';
 import { formatCurrency } from '@/lib/utils';
-import { CheckCircle2, LayoutDashboard, Calendar, Truck, ShieldCheck, Camera, Sparkles, Phone } from 'lucide-react';
+import { CheckCircle2, LayoutDashboard, Calendar, Truck, ShieldCheck, Camera, Sparkles, Phone, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { PrintInvoiceButton } from '@/components/rentals/PrintInvoiceButton';
@@ -106,24 +106,24 @@ export default async function ConfirmedPage({ params }: ConfirmedPageProps) {
   }
 
   return (
-    <div className="bg-[#f3f3f3] min-h-screen py-10 text-gray-900">
+    <div className="bg-cinema-bg min-h-screen py-10 text-cinema-text">
       <div className="mx-auto max-w-3xl px-4 space-y-8">
         {/* Success Splash Card */}
-        <div className="rounded-3xl border border-gray-200 bg-white p-8 text-center shadow-sm space-y-4">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-lenstiger-50 text-lenstiger shadow-xs">
+        <div className="rounded-3xl border border-cinema-border bg-cinema-card p-8 text-center shadow-cinema space-y-4">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-semantic-success/15 border border-semantic-success/30 text-semantic-success shadow-xs">
             <CheckCircle2 className="h-10 w-10" />
           </div>
 
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-lenstiger-50 text-lenstiger font-bold text-xs">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 border border-accent/30 text-accent font-bold text-xs uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>BOOKING CONFIRMED & DISPATCHED</span>
+              <span>BOOKING CONFIRMED &amp; DISPATCHED</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 headingbold">
+            <h1 className="text-2xl sm:text-3xl font-black text-cinema-text headingbold">
               Your Gear is Reserved!
             </h1>
-            <p className="text-xs text-gray-500 max-w-md mx-auto">
-              Order ID <strong className="text-gray-900 font-mono">{order.rental_id || order.id}</strong> is locked.
+            <p className="text-xs text-cinema-muted max-w-md mx-auto">
+              Order ID <strong className="text-cinema-text font-mono">{order.rental_id || order.id}</strong> is locked.
               Our production engineer will contact you on WhatsApp shortly for dispatch tracking.
             </p>
           </div>
@@ -133,14 +133,14 @@ export default async function ConfirmedPage({ params }: ConfirmedPageProps) {
             <PrintInvoiceButton orderId={order.id} rentalId={order.rental_id} />
 
             <Link href="/account">
-              <Button variant="outline" className="rounded-2xl border-gray-300 text-gray-700 font-semibold">
-                <LayoutDashboard className="h-4 w-4 mr-2 text-lenstiger" />
+              <Button variant="outline" className="rounded-2xl border-cinema-border text-cinema-text hover:bg-cinema-elevated font-semibold text-xs">
+                <LayoutDashboard className="h-4 w-4 mr-2 text-accent" />
                 <span>My Bookings</span>
               </Button>
             </Link>
 
             <Link href="/equipment">
-              <Button className="rounded-2xl bg-gold hover:bg-gold-hover text-gray-950 font-black">
+              <Button className="rounded-2xl bg-accent hover:bg-accent-hover text-cinema-bg font-black text-xs">
                 <Camera className="h-4 w-4 mr-2" />
                 <span>Explore More Gear</span>
               </Button>
@@ -149,36 +149,36 @@ export default async function ConfirmedPage({ params }: ConfirmedPageProps) {
         </div>
 
         {/* Order Details Breakdown Card */}
-        <div className="rounded-3xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
-          <h2 className="text-base font-black text-gray-900 headingbold border-b border-gray-100 pb-3 flex items-center justify-between">
-            <span>Rental Schedule & Gear</span>
-            <span className="text-xs font-bold text-lenstiger uppercase">
+        <div className="rounded-3xl border border-cinema-border bg-cinema-card p-6 sm:p-8 shadow-cinema space-y-6">
+          <h2 className="text-base font-black text-cinema-text headingbold border-b border-cinema-border pb-3 flex items-center justify-between">
+            <span>Rental Schedule &amp; Gear</span>
+            <span className="text-xs font-bold text-accent uppercase">
               {order.delivery_mode === 'DELIVERY' ? 'Doorstep Delivery' : 'Hub Pickup'}
             </span>
           </h2>
 
           {/* Dates & Logistics */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
-              <div className="flex items-center gap-1.5 font-bold text-gray-700">
-                <Calendar className="h-3.5 w-3.5 text-lenstiger" />
+            <div className="p-4 rounded-2xl bg-cinema-elevated border border-cinema-border space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-cinema-muted">
+                <Calendar className="h-3.5 w-3.5 text-accent" />
                 <span>Rental Dates</span>
               </div>
-              <div className="font-semibold text-gray-900 text-sm">
+              <div className="font-semibold text-cinema-text text-sm">
                 {order.start_date} → {order.end_date}
               </div>
-              <div className="text-gray-500">{order.total_days || 1} Production Days</div>
+              <div className="text-cinema-muted">{order.total_days || 1} Production Days</div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100 space-y-1">
-              <div className="flex items-center gap-1.5 font-bold text-gray-700">
-                <Truck className="h-3.5 w-3.5 text-lenstiger" />
+            <div className="p-4 rounded-2xl bg-cinema-elevated border border-cinema-border space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-cinema-muted">
+                <Truck className="h-3.5 w-3.5 text-accent" />
                 <span>Fulfillment Location</span>
               </div>
-              <div className="font-semibold text-gray-900 text-sm">
+              <div className="font-semibold text-cinema-text text-sm">
                 {order.address?.fullName || 'Valued Client'}
               </div>
-              <div className="text-gray-500 line-clamp-1">
+              <div className="text-cinema-muted line-clamp-1">
                 {order.address?.line1}, {order.address?.city || 'Chennai'}
               </div>
             </div>
@@ -186,15 +186,15 @@ export default async function ConfirmedPage({ params }: ConfirmedPageProps) {
 
           {/* Equipment List */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500">Reserved Equipment</h3>
-            <div className="divide-y divide-gray-100">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-cinema-muted">Reserved Equipment</h3>
+            <div className="divide-y divide-cinema-border">
               {order.rental_items?.map((item: any, idx: number) => (
                 <div key={idx} className="py-3 flex items-center justify-between text-xs">
                   <div>
-                    <div className="font-bold text-gray-900">{item.equipment?.name}</div>
-                    <div className="text-gray-500">Qty: {item.quantity} • Rate: {formatCurrency(item.daily_price)}/day</div>
+                    <div className="font-bold text-cinema-text">{item.equipment?.name || 'Cinema Gear Package'}</div>
+                    <div className="text-cinema-muted">Qty: {item.quantity} • Rate: {formatCurrency(item.daily_price)}/day</div>
                   </div>
-                  <div className="font-black text-lenstiger">
+                  <div className="font-black text-accent">
                     {formatCurrency(item.subtotal || item.daily_price * item.quantity)}
                   </div>
                 </div>
@@ -203,35 +203,35 @@ export default async function ConfirmedPage({ params }: ConfirmedPageProps) {
           </div>
 
           {/* Pricing Totals */}
-          <div className="border-t border-gray-100 pt-4 space-y-2 text-xs">
-            <div className="flex justify-between text-gray-600">
+          <div className="border-t border-cinema-border pt-4 space-y-2 text-xs">
+            <div className="flex justify-between text-cinema-muted">
               <span>Rental Subtotal</span>
-              <span className="font-semibold text-gray-900">{formatCurrency(order.subtotal)}</span>
+              <span className="font-semibold text-cinema-text">{formatCurrency(order.subtotal)}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-cinema-muted">
               <span>Fulfillment Fee</span>
-              <span className="font-semibold text-gray-900">{formatCurrency(order.delivery_fee)}</span>
+              <span className="font-semibold text-cinema-text">{formatCurrency(order.delivery_fee)}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-cinema-muted">
               <span>GST (18%)</span>
-              <span className="font-semibold text-gray-900">{formatCurrency(order.tax)}</span>
+              <span className="font-semibold text-cinema-text">{formatCurrency(order.tax)}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-cinema-muted">
               <span>Refundable Security Deposit</span>
-              <span className="font-semibold text-gray-900">{formatCurrency(order.security_deposit)}</span>
+              <span className="font-semibold text-cinema-text">{formatCurrency(order.security_deposit)}</span>
             </div>
-            <div className="border-t border-gray-200 pt-3 flex justify-between items-baseline">
-              <span className="font-bold text-gray-900 text-sm">Grand Total Paid</span>
-              <span className="font-black text-xl text-lenstiger">{formatCurrency(order.total)}</span>
+            <div className="border-t border-cinema-border pt-3 flex justify-between items-baseline">
+              <span className="font-bold text-cinema-text text-sm">Grand Total Paid</span>
+              <span className="font-black text-xl text-accent">{formatCurrency(order.total)}</span>
             </div>
           </div>
         </div>
 
         {/* WhatsApp Support Box */}
-        <div className="rounded-3xl border border-lenstiger/20 bg-lenstiger-50 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="rounded-3xl border border-cinema-border bg-cinema-card p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-cinema">
           <div className="space-y-1 text-center sm:text-left">
-            <h3 className="font-bold text-gray-900 text-sm">Need On-Set Assistance?</h3>
-            <p className="text-xs text-gray-600">Our technical dispatch helpline is live 24/7 on WhatsApp.</p>
+            <h3 className="font-bold text-cinema-text text-sm">Need On-Set Assistance?</h3>
+            <p className="text-xs text-cinema-muted">Our technical dispatch helpline is live 24/7 on WhatsApp.</p>
           </div>
           <a
             href="https://wa.me/919884039091"
