@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useCart } from '@/components/providers/CartProvider';
 import { CartItemRow } from '@/components/cart/CartItemRow';
 import { CartSummary } from '@/components/cart/CartSummary';
-import { ShoppingBag, ArrowLeft, RefreshCw, Trash2, Camera } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, RefreshCw, Trash2, Camera, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function CartPage() {
@@ -26,21 +26,23 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="bg-[#f3f3f3] min-h-screen py-20 px-4">
-        <div className="mx-auto max-w-2xl bg-white rounded-3xl p-10 text-center border border-gray-200 shadow-sm space-y-6">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-lenstiger-50 text-lenstiger shadow-xs">
-            <ShoppingBag className="h-10 w-10" />
+      <div className="bg-cinema-bg min-h-screen py-24 px-4 text-cinema-text">
+        <div className="mx-auto max-w-2xl bg-cinema-surface rounded-3xl p-12 text-center border border-cinema-border shadow-cinema-md space-y-6">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-cinema-tertiary border border-cinema-border text-accent shadow-cinema-glow">
+            <ShoppingBag className="h-10 w-10 text-accent" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 headingbold">Your Rental Cart is Empty</h1>
-            <p className="text-xs sm:text-sm text-gray-500 max-w-md mx-auto">
+            <h1 className="text-2xl sm:text-3xl font-black text-cinema-text font-heading">
+              Your Rental Cart is Empty
+            </h1>
+            <p className="text-xs sm:text-sm text-cinema-text-secondary max-w-md mx-auto leading-relaxed">
               Explore our professional catalog of cameras, cinema lenses, lighting, and shooting bundles in your city.
             </p>
           </div>
           <Link href="/equipment">
-            <Button size="lg" className="rounded-2xl font-black bg-gold hover:bg-gold-hover text-gray-950 px-8 shadow-sm">
+            <Button size="lg" className="rounded-xl font-black bg-accent hover:bg-accent-hover text-cinema-bg px-8 shadow-cinema-accent">
               <Camera className="h-4 w-4 mr-2" />
-              <span>Browse All Equipment</span>
+              <span>Browse Cinema Equipment</span>
             </Button>
           </Link>
         </div>
@@ -49,14 +51,20 @@ export default function CartPage() {
   }
 
   return (
-    <div className="bg-[#f3f3f3] min-h-screen py-8 text-gray-900">
+    <div className="bg-cinema-bg min-h-screen py-10 text-cinema-text">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-cinema-border pb-6">
           <div>
-            <h1 className="text-3xl font-black text-gray-900 headingbold">Rental Equipment Cart</h1>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
-              Review equipment, customize rental days, and preview total costs with 18% GST and refundable deposit.
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 text-accent text-xs font-bold uppercase tracking-wider border border-accent/30 shadow-cinema-glow mb-2">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Production Order</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-black text-cinema-text font-heading">
+              Rental Equipment Cart
+            </h1>
+            <p className="text-xs sm:text-sm text-cinema-text-secondary mt-1">
+              Review selected gear, customize shoot dates, and verify total costs with 18% GST and refundable deposit.
             </p>
           </div>
 
@@ -66,9 +74,9 @@ export default function CartPage() {
               size="sm"
               onClick={() => recheckCartAvailability()}
               disabled={isCheckingAvailability}
-              className="text-xs border-gray-300 text-gray-700 hover:bg-gray-100 rounded-xl"
+              className="text-xs border-cinema-border bg-cinema-surface text-cinema-text hover:bg-cinema-tertiary rounded-xl"
             >
-              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isCheckingAvailability ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 text-accent ${isCheckingAvailability ? 'animate-spin' : ''}`} />
               <span>Re-check Live Stock</span>
             </Button>
 
@@ -76,7 +84,7 @@ export default function CartPage() {
               variant="ghost"
               size="sm"
               onClick={clearCart}
-              className="text-xs text-rose-600 hover:bg-rose-50 hover:text-rose-700 rounded-xl"
+              className="text-xs text-semantic-error hover:bg-semantic-error/10 hover:text-semantic-error rounded-xl"
             >
               <Trash2 className="h-3.5 w-3.5 mr-1.5" />
               <span>Empty Cart</span>
@@ -101,7 +109,7 @@ export default function CartPage() {
             <div className="pt-2">
               <Link
                 href="/equipment"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-lenstiger hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:underline"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 <span>Continue Adding More Gear</span>

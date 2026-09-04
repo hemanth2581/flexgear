@@ -1,9 +1,9 @@
 import React, { Suspense } from 'react';
-import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/server';
 import { EquipmentFilters } from '@/components/equipment/EquipmentFilters';
 import { EquipmentCatalogView } from '@/components/equipment/EquipmentCatalogView';
 import { Category, Brand, Equipment } from '@/types/equipment';
-
+import { Sparkles, SlidersHorizontal, Camera } from 'lucide-react';
 
 export const revalidate = 0; // Dynamic route
 
@@ -121,39 +121,47 @@ export default async function EquipmentPage({ searchParams }: EquipmentPageProps
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
-      {/* Header Banner */}
-      <div className="space-y-2 border-b border-zinc-800 pb-6">
-        <h1 className="text-3xl font-black text-white sm:text-4xl">
-          Cinema Equipment Catalog
-        </h1>
-        <p className="text-xs sm:text-sm text-zinc-400">
-          Rent calibrated cinema cameras, prime optics, studio lights, 32-bit audio, and pro gimbals with instant availability verification.
-        </p>
-      </div>
+    <div className="bg-cinema-bg min-h-screen text-cinema-text">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+        {/* Header Banner */}
+        <div className="space-y-3 border-b border-cinema-border pb-8">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 text-accent text-xs font-bold uppercase tracking-wider border border-accent/30 shadow-cinema-glow">
+            <Camera className="w-3.5 h-3.5" />
+            <span>Live Production Inventory</span>
+          </div>
 
-      {/* Main Grid with Left Sidebar Filters */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-        {/* Left Filter Sidebar */}
-        <div className="lg:col-span-1">
-          <Suspense fallback={<div className="h-64 rounded-2xl bg-zinc-900 animate-pulse" />}>
-            <EquipmentFilters categories={categories} brands={brands} />
-          </Suspense>
+          <h1 className="text-3xl sm:text-5xl font-black text-cinema-text font-heading tracking-tight">
+            Cinema Equipment Catalog
+          </h1>
+
+          <p className="text-xs sm:text-sm text-cinema-text-secondary max-w-2xl leading-relaxed">
+            Rent calibrated cinema bodies, fast anamorphic primes, studio lighting fixtures, 32-bit float audio, and professional camera stabilizers.
+          </p>
         </div>
 
-        {/* Right Equipment Grid */}
-        <div className="lg:col-span-3">
-          <Suspense fallback={<div className="h-96 rounded-2xl bg-zinc-900 animate-pulse" />}>
-            <EquipmentCatalogView
-              equipmentList={equipmentList}
-              totalCount={totalCount}
-              categories={categories}
-              brands={brands}
-              page={page}
-              limit={limit}
-              sortParam={sortParam}
-            />
-          </Suspense>
+        {/* Main Grid with Left Sidebar Filters */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
+          {/* Left Filter Sidebar */}
+          <div className="lg:col-span-1">
+            <Suspense fallback={<div className="h-64 rounded-2xl bg-cinema-surface animate-pulse border border-cinema-border" />}>
+              <EquipmentFilters categories={categories} brands={brands} />
+            </Suspense>
+          </div>
+
+          {/* Right Equipment Grid */}
+          <div className="lg:col-span-3">
+            <Suspense fallback={<div className="h-96 rounded-2xl bg-cinema-surface animate-pulse border border-cinema-border" />}>
+              <EquipmentCatalogView
+                equipmentList={equipmentList}
+                totalCount={totalCount}
+                categories={categories}
+                brands={brands}
+                page={page}
+                limit={limit}
+                sortParam={sortParam}
+              />
+            </Suspense>
+          </div>
         </div>
       </div>
     </div>

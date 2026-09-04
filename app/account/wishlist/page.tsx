@@ -28,26 +28,26 @@ export default async function WishlistPage() {
   }
 
   return (
-    <div className="rounded-3xl border border-gray-200 bg-white p-6 sm:p-8 space-y-6 shadow-sm">
-      <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+    <div className="rounded-3xl border border-cinema-border bg-cinema-card p-6 sm:p-8 space-y-6 shadow-cinema">
+      <div className="flex items-center justify-between border-b border-cinema-border pb-4">
         <div>
-          <h2 className="text-xl font-black text-gray-900 headingbold flex items-center gap-2">
-            <Heart className="h-5 w-5 text-rose-500 fill-rose-500" />
+          <h2 className="text-xl font-black text-cinema-text headingbold flex items-center gap-2">
+            <Heart className="h-5 w-5 text-semantic-error fill-semantic-error" />
             <span>Saved Production Wishlist</span>
           </h2>
-          <p className="text-xs text-gray-500">Cameras and gear bookmarked for future projects</p>
+          <p className="text-xs text-cinema-muted">Cameras and gear bookmarked for future projects</p>
         </div>
       </div>
 
       {wishlistItems.length === 0 ? (
         <div className="py-12 text-center space-y-4">
-          <Heart className="h-10 w-10 text-gray-300 mx-auto" />
-          <div className="text-sm font-bold text-gray-900">Your Wishlist is Empty</div>
-          <p className="text-xs text-gray-500 max-w-sm mx-auto">
+          <Heart className="h-10 w-10 text-cinema-muted/40 mx-auto" />
+          <div className="text-sm font-bold text-cinema-text">Your Wishlist is Empty</div>
+          <p className="text-xs text-cinema-muted max-w-sm mx-auto">
             Click the heart icon on any camera or lens in the catalog to save it to your project kit.
           </p>
           <Link href="/equipment">
-            <Button size="sm" className="font-black text-xs bg-gold hover:bg-gold-hover text-gray-950 rounded-xl px-6">
+            <Button size="sm" className="font-black text-xs bg-accent hover:bg-accent-hover text-cinema-bg rounded-xl px-6 cursor-pointer">
               <Camera className="h-4 w-4 mr-1.5" />
               <span>Explore Catalog</span>
             </Button>

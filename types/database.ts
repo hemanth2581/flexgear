@@ -447,6 +447,105 @@ export interface Database {
         };
         Relationships: [];
       };
+      contact_inquiries: {
+        Row: {
+          id: string;
+          name: string;
+          phone: string;
+          email: string | null;
+          city: string | null;
+          message: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          phone: string;
+          email?: string | null;
+          city?: string | null;
+          message: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          phone?: string;
+          email?: string | null;
+          city?: string | null;
+          message?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      partner_applications: {
+        Row: {
+          id: string;
+          name: string;
+          phone: string;
+          email: string | null;
+          city: string | null;
+          gear_details: string;
+          status: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          phone: string;
+          email?: string | null;
+          city?: string | null;
+          gear_details: string;
+          status?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          phone?: string;
+          email?: string | null;
+          city?: string | null;
+          gear_details?: string;
+          status?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      kyc_verifications: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          full_name: string;
+          phone: string | null;
+          doc_type: string;
+          doc_number: string;
+          document_url: string | null;
+          status: string;
+          verified_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          full_name: string;
+          phone?: string | null;
+          doc_type: string;
+          doc_number: string;
+          document_url?: string | null;
+          status?: string;
+          verified_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          full_name?: string;
+          phone?: string | null;
+          doc_type?: string;
+          doc_number?: string;
+          document_url?: string | null;
+          status?: string;
+          verified_at?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;

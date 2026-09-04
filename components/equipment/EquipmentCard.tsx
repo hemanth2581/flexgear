@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Equipment } from '@/types/equipment';
-import { formatCurrency } from '@/lib/utils';
-import { Calendar, ShoppingBag, Heart, Scale, Check, ShieldCheck, Zap } from 'lucide-react';
+import { Calendar, ShoppingBag, Heart, Check, Sparkles, MapPin } from 'lucide-react';
 import { useCart } from '@/components/providers/CartProvider';
 import { format, addDays } from 'date-fns';
 
@@ -61,17 +60,18 @@ export function EquipmentCard({
     'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format&fit=crop&q=80';
 
   return (
-    <div className="group relative flex flex-col justify-between h-full bg-white rounded-2xl p-4 sm:p-5 border border-gray-200/80 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
+    <div className="group relative flex flex-col justify-between h-full bg-cinema-surface rounded-2xl p-4 sm:p-5 border border-cinema-border shadow-cinema-sm hover:shadow-cinema-lg hover:border-cinema-border-strong hover:-translate-y-1 transition-all duration-300">
       {/* Top Badges & Wishlist */}
-      <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
-        <div className="flex items-center gap-1">
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-1.5 flex-wrap">
           {equipment.is_featured && (
-            <span className="bg-gold text-gray-950 font-extrabold text-[10px] uppercase px-2 py-0.5 rounded-md shadow-sm">
-              Popular
+            <span className="inline-flex items-center gap-1 bg-accent/15 text-accent border border-accent/30 font-extrabold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-cinema-glow">
+              <Sparkles className="w-2.5 h-2.5" />
+              <span>Flagship</span>
             </span>
           )}
           {equipment.brand && (
-            <span className="bg-gray-100 text-gray-700 font-bold text-[10px] px-2 py-0.5 rounded-md border border-gray-200">
+            <span className="bg-cinema-tertiary text-cinema-text-secondary font-bold text-[10px] px-2 py-0.5 rounded-md border border-cinema-border">
               {equipment.brand.name}
             </span>
           )}
@@ -79,10 +79,10 @@ export function EquipmentCard({
 
         <button
           onClick={handleWishlistClick}
-          className={`pointer-events-auto p-1.5 rounded-full backdrop-blur-md transition ${
+          className={`p-1.5 rounded-full transition cursor-pointer ${
             wishlisted
-              ? 'bg-rose-50 text-rose-500'
-              : 'bg-white/80 text-gray-400 hover:text-rose-500 hover:bg-white'
+              ? 'bg-semantic-error/20 text-semantic-error'
+              : 'bg-cinema-tertiary/70 text-cinema-text-muted hover:text-semantic-error hover:bg-cinema-card'
           }`}
           aria-label="Wishlist"
         >
@@ -90,69 +90,80 @@ export function EquipmentCard({
         </button>
       </div>
 
-      {/* Product Image */}
-      <Link href={`/equipment/${equipment.id}`} className="block relative aspect-square w-full mb-3 rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center p-2">
+      {/* Product Image Stage */}
+      <Link
+        href={`/equipment/${equipment.id}`}
+        className="block relative aspect-square w-full mb-3.5 rounded-xl overflow-hidden bg-cinema-bg border border-cinema-border/60 flex items-center justify-center p-3 group/img"
+      >
         <Image
           src={imageUrl}
           alt={equipment.name}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+          className="object-contain p-3 transition-transform duration-500 group-hover/img:scale-105"
         />
+        {/* Availability indicator badge */}
+        <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cinema-bg/90 backdrop-blur-sm border border-cinema-border text-[10px] text-semantic-success font-semibold">
+          <span className="w-1.5 h-1.5 rounded-full bg-semantic-success animate-pulse-dot" />
+          <span>In Stock</span>
+        </div>
       </Link>
 
-      {/* Product Name */}
-      <div className="mb-2">
+      {/* Product Name & Category */}
+      <div className="mb-3 text-left">
+        <span className="text-[11px] text-cinema-text-muted font-medium uppercase tracking-wider block mb-1">
+          {equipment.category?.name || 'Cinema Equipment'}
+        </span>
         <Link href={`/equipment/${equipment.id}`}>
-          <h3 className="text-sm sm:text-base font-bold text-gray-900 line-clamp-2 min-h-[2.75rem] hover:text-lenstiger transition-colors">
+          <h3 className="text-sm sm:text-base font-bold text-cinema-text font-heading line-clamp-2 min-h-[2.75rem] group-hover:text-accent transition-colors">
             {equipment.name}
           </h3>
         </Link>
-        <span className="text-[11px] text-gray-500 font-medium block mt-0.5">
-          {equipment.category?.name || 'Production Gear'}
-        </span>
       </div>
 
-      {/* Horizontal Divider */}
-      <hr className="my-2.5 border-gray-100" />
+      {/* Pricing and Action Row */}
+      <div className="space-y-2.5 pt-2 border-t border-cinema-border/70">
+        <div className="flex items-baseline justify-between gap-2">
+          <div>
+            <div className="text-xs text-cinema-text-muted">Daily Rental</div>
+            <div className="text-base sm:text-lg font-black text-accent font-heading">
+              ₹{equipment.daily_price?.toLocaleString()}
+              <span className="text-xs text-cinema-text-muted font-normal">/day</span>
+            </div>
+          </div>
+          {equipment.daily_price && (
+            <div className="text-[11px] text-cinema-text-disabled line-through">
+              ₹{Math.round(equipment.daily_price * 1.25).toLocaleString()}
+            </div>
+          )}
+        </div>
 
-      {/* Bottom Action Row (View Pricing Button + Cart Button) */}
-      <div className="space-y-2.5">
-        <div className="flex items-center justify-between gap-2">
-          {/* View Pricing Button */}
+        {/* Buttons */}
+        <div className="flex items-center gap-2">
           <button
             onClick={handleOpenPricing}
-            className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-lenstiger hover:text-white text-gray-800 font-bold text-xs transition-all active:scale-95 group/btn"
+            className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-cinema-tertiary hover:bg-accent hover:text-cinema-bg text-cinema-text font-bold text-xs transition-all active:scale-95 border border-cinema-border hover:border-accent cursor-pointer group/btn"
           >
-            <Calendar className="w-3.5 h-3.5 text-lenstiger group-hover/btn:text-white transition-colors" />
-            <span>View Pricing</span>
+            <Calendar className="w-3.5 h-3.5 text-accent group-hover/btn:text-cinema-bg transition-colors" />
+            <span>Select Dates</span>
           </button>
 
-          {/* Quick Cart Button */}
           <button
             onClick={handleQuickCart}
-            className={`p-2 rounded-xl transition-all active:scale-95 flex items-center justify-center ${
+            className={`p-2.5 rounded-xl transition-all active:scale-95 flex items-center justify-center border cursor-pointer ${
               addedDirectly
-                ? 'bg-emerald-600 text-white'
-                : 'bg-gray-100 hover:bg-gold hover:text-gray-950 text-gray-700'
+                ? 'bg-semantic-success text-white border-semantic-success'
+                : 'bg-cinema-tertiary hover:bg-accent hover:text-cinema-bg text-cinema-text border-cinema-border hover:border-accent'
             }`}
             title="Add to Cart"
             aria-label="Add to Cart"
           >
             {addedDirectly ? (
-              <Check className="w-4 h-4" />
+              <Check className="w-4 h-4 stroke-[2.5]" />
             ) : (
               <ShoppingBag className="w-4 h-4" />
             )}
           </button>
-        </div>
-
-        {/* Daily Rate Tag */}
-        <div className="flex items-center justify-center gap-1.5 text-xs font-black text-lenstiger bg-lenstiger-50 py-1.5 rounded-lg border border-lenstiger/10">
-          <span>₹{equipment.daily_price.toLocaleString()}/day</span>
-          <span className="text-[10px] text-gray-400 font-normal line-through">
-            ₹{Math.round(equipment.daily_price * 1.25).toLocaleString()}
-          </span>
         </div>
       </div>
     </div>

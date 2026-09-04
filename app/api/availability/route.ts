@@ -40,3 +40,38 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+
+    if (body.items && Array.isArray(body.items)) {
+      const batchResult = await InventoryService.checkMultipleAvailability(body.items);
+      return NextResponse.json(batchResult);
+    }
+
+    const parsed = AvailabilityQuerySchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid parameters', details: parsed.error.format() },
+        { status: 400 }
+      );
+    }
+
+    const { equipmentId, startDate, endDate, quantity } = parsed.data;
+    const result = await InventoryService.checkAvailability(
+      equipmentId,
+      startDate,
+      endDate,
+      quantity
+    );
+
+    return NextResponse.json(result);
+  } catch (error: any) {
+    console.error('[API Availability POST] Error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error checking availability' },
+      { status: 500 }
+    );
+  }
+}

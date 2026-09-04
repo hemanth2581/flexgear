@@ -9,7 +9,7 @@ import { AddressForm } from '@/components/checkout/AddressForm';
 import { OtpStep } from '@/components/checkout/OtpStep';
 import { MockPaymentStep } from '@/components/checkout/MockPaymentStep';
 import { CartSummary } from '@/components/cart/CartSummary';
-import { Check, ShieldCheck, MapPin, Phone, CreditCard, ShoppingBag } from 'lucide-react';
+import { Check, ShieldCheck, MapPin, Phone, CreditCard, ShoppingBag, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -42,15 +42,15 @@ export default function CheckoutPage() {
 
   if (items.length === 0 && !rentalOrderId) {
     return (
-      <div className="bg-[#f3f3f3] min-h-screen py-20 px-4">
-        <div className="mx-auto max-w-md bg-white rounded-3xl p-10 text-center border border-gray-200 shadow-sm space-y-4">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-lenstiger-50 text-lenstiger shadow-xs">
-            <ShoppingBag className="h-8 w-8" />
+      <div className="bg-cinema-bg min-h-screen py-24 px-4 text-cinema-text">
+        <div className="mx-auto max-w-md bg-cinema-surface rounded-3xl p-10 text-center border border-cinema-border shadow-cinema-md space-y-4">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-cinema-tertiary border border-cinema-border text-accent shadow-cinema-glow">
+            <ShoppingBag className="h-8 w-8 text-accent" />
           </div>
-          <h1 className="text-xl font-black text-gray-900 headingbold">Your Cart is Empty</h1>
-          <p className="text-xs text-gray-500">Please add gear to your cart before proceeding to checkout.</p>
-          <Link href="/equipment" className="inline-block pt-2 text-xs font-bold text-lenstiger hover:underline">
-            Return to Equipment Catalog
+          <h1 className="text-xl font-black text-cinema-text font-heading">Your Cart is Empty</h1>
+          <p className="text-xs text-cinema-text-secondary">Please add gear to your cart before proceeding to checkout.</p>
+          <Link href="/equipment" className="inline-block pt-2 text-xs font-bold text-accent hover:underline">
+            Return to Cinema Equipment Catalog →
           </Link>
         </div>
       </div>
@@ -114,14 +114,20 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="bg-[#f3f3f3] min-h-screen py-8 text-gray-900">
+    <div className="bg-cinema-bg min-h-screen py-10 text-cinema-text">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Checkout Header & Steps Indicator */}
-        <div className="border-b border-gray-200 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="border-b border-cinema-border pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 headingbold">Secure Equipment Checkout</h1>
-            <p className="text-xs text-gray-500 mt-1">
-              Complete contact info, instant SMS OTP verification, and secure payment.
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/15 text-accent text-xs font-bold uppercase tracking-wider border border-accent/30 shadow-cinema-glow mb-2">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Production Order Checkout</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-cinema-text font-heading">
+              Secure Equipment Checkout
+            </h1>
+            <p className="text-xs text-cinema-text-secondary mt-1">
+              Contact info, instant phone OTP verification, and secure production payment.
             </p>
           </div>
 
@@ -129,34 +135,34 @@ export default function CheckoutPage() {
           <div className="flex items-center space-x-2">
             <div className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold ${
               currentStep === 1
-                ? 'bg-lenstiger text-white shadow-xs'
+                ? 'bg-accent text-cinema-bg font-black shadow-cinema-sm'
                 : currentStep > 1
-                ? 'bg-lenstiger-50 text-lenstiger'
-                : 'bg-gray-200 text-gray-400'
+                ? 'bg-accent/15 text-accent border border-accent/30'
+                : 'bg-cinema-tertiary text-cinema-text-muted border border-cinema-border'
             }`}>
-              {currentStep > 1 ? <Check className="h-3.5 w-3.5" /> : <span>1</span>}
+              {currentStep > 1 ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : <span>1</span>}
               <span>Details</span>
             </div>
 
-            <span className="text-gray-300">──</span>
+            <span className="text-cinema-border">──</span>
 
             <div className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold ${
               currentStep === 2
-                ? 'bg-lenstiger text-white shadow-xs'
+                ? 'bg-accent text-cinema-bg font-black shadow-cinema-sm'
                 : currentStep > 2
-                ? 'bg-lenstiger-50 text-lenstiger'
-                : 'bg-gray-200 text-gray-400'
+                ? 'bg-accent/15 text-accent border border-accent/30'
+                : 'bg-cinema-tertiary text-cinema-text-muted border border-cinema-border'
             }`}>
-              {currentStep > 2 ? <Check className="h-3.5 w-3.5" /> : <span>2</span>}
+              {currentStep > 2 ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : <span>2</span>}
               <span>OTP</span>
             </div>
 
-            <span className="text-gray-300">──</span>
+            <span className="text-cinema-border">──</span>
 
             <div className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-bold ${
               currentStep === 3
-                ? 'bg-lenstiger text-white shadow-xs'
-                : 'bg-gray-200 text-gray-400'
+                ? 'bg-accent text-cinema-bg font-black shadow-cinema-sm'
+                : 'bg-cinema-tertiary text-cinema-text-muted border border-cinema-border'
             }`}>
               <span>3</span>
               <span>Payment</span>
@@ -209,20 +215,20 @@ export default function CheckoutPage() {
             />
 
             {/* Gear Items Preview Card */}
-            <div className="rounded-3xl border border-gray-200 bg-white p-5 space-y-3 shadow-2xs">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-600">
-                Reserved Equipment ({items.length})
+            <div className="rounded-3xl border border-cinema-border bg-cinema-surface p-5 space-y-3 shadow-cinema-sm">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-cinema-text-secondary font-heading">
+                Reserved Cinema Gear ({items.length})
               </h4>
-              <div className="divide-y divide-gray-100 text-xs">
+              <div className="divide-y divide-cinema-border text-xs">
                 {items.map((item) => (
-                  <div key={item.equipment.id} className="py-2 flex items-center justify-between">
+                  <div key={item.equipment.id} className="py-2.5 flex items-center justify-between">
                     <div>
-                      <div className="font-bold text-gray-900">{item.equipment.name}</div>
-                      <div className="text-[11px] text-gray-500">
+                      <div className="font-bold text-cinema-text">{item.equipment.name}</div>
+                      <div className="text-[11px] text-cinema-text-muted">
                         {item.startDate} → {item.endDate} ({item.days} days) • Qty: {item.quantity}
                       </div>
                     </div>
-                    <div className="font-black text-lenstiger">
+                    <div className="font-black text-accent font-heading">
                       ₹{(item.dailyPrice * item.days * item.quantity).toLocaleString()}
                     </div>
                   </div>

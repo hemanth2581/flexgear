@@ -334,19 +334,19 @@ export function FirebaseOtpLoginForm({
       <FirebaseConsoleGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
 
       {/* Firebase Badge & Setup Guide Button */}
-      <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 border border-amber-200/80 flex items-center justify-between shadow-2xs">
+      <div className="p-3.5 rounded-2xl bg-cinema-card border border-cinema-border flex items-center justify-between shadow-2xs">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-accent/15 text-accent flex items-center justify-center shrink-0 border border-accent/30">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-xs font-black text-gray-900 flex items-center gap-1.5">
+            <div className="text-xs font-black text-cinema-text flex items-center gap-1.5">
               <span>Firebase Authentication</span>
-              <span className="text-[10px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.2 rounded-md">
+              <span className="text-[10px] bg-accent/20 text-accent font-bold px-1.5 py-0.2 rounded-md border border-accent/40">
                 OTP
               </span>
             </div>
-            <p className="text-[11px] text-gray-600">
+            <p className="text-[11px] text-cinema-muted">
               Live SMS &amp; Test Numbers via Firebase Console
             </p>
           </div>
@@ -355,15 +355,15 @@ export function FirebaseOtpLoginForm({
         <button
           type="button"
           onClick={() => setIsGuideOpen(true)}
-          className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-200 shadow-2xs transition flex items-center gap-1 cursor-pointer"
+          className="px-2.5 py-1.5 rounded-xl bg-cinema-elevated hover:bg-cinema-border text-cinema-text text-[11px] font-bold border border-cinema-border shadow-2xs transition flex items-center gap-1 cursor-pointer"
         >
-          <HelpCircle className="w-3.5 h-3.5" />
+          <HelpCircle className="w-3.5 h-3.5 text-accent" />
           <span>Console Guide</span>
         </button>
       </div>
 
       {/* Method Tabs: Phone OTP vs Password */}
-      <div className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl border border-gray-200 bg-white shadow-2xs">
+      <div className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl border border-cinema-border bg-cinema-card shadow-2xs">
         <button
           type="button"
           onClick={() => {
@@ -372,8 +372,8 @@ export function FirebaseOtpLoginForm({
           }}
           className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             authMethod === 'phone'
-              ? 'bg-lenstiger text-white shadow-xs'
-              : 'text-gray-600 hover:text-black'
+              ? 'bg-accent text-cinema-bg shadow-xs font-black'
+              : 'text-cinema-muted hover:text-cinema-text'
           }`}
         >
           <Smartphone className="h-4 w-4" />
@@ -385,8 +385,8 @@ export function FirebaseOtpLoginForm({
           onClick={() => setAuthMethod('password')}
           className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             authMethod === 'password'
-              ? 'bg-lenstiger text-white shadow-xs'
-              : 'text-gray-600 hover:text-black'
+              ? 'bg-accent text-cinema-bg shadow-xs font-black'
+              : 'text-cinema-muted hover:text-cinema-text'
           }`}
         >
           <Lock className="h-4 w-4" />
@@ -395,14 +395,14 @@ export function FirebaseOtpLoginForm({
       </div>
 
       {/* Main Form Card */}
-      <div className="rounded-3xl border border-gray-200 bg-white p-6 sm:p-8 shadow-sm space-y-5">
+      <div className="rounded-3xl border border-cinema-border bg-cinema-card p-6 sm:p-8 shadow-cinema space-y-5">
         {authMethod === 'phone' ? (
           <div>
             {step === 'phone_entry' ? (
               <form onSubmit={handleSendPhoneOtp} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                    <Smartphone className="h-3.5 w-3.5 text-lenstiger" />
+                  <label className="text-xs font-bold text-cinema-text flex items-center gap-1.5">
+                    <Smartphone className="h-3.5 w-3.5 text-accent" />
                     <span>Mobile Phone Number</span>
                   </label>
 
@@ -410,10 +410,10 @@ export function FirebaseOtpLoginForm({
                     <select
                       value={countryCode}
                       onChange={(e) => setCountryCode(e.target.value)}
-                      className="w-32 rounded-xl border border-gray-300 bg-gray-50/50 px-2 text-xs font-semibold text-gray-900 focus:border-lenstiger focus:outline-none"
+                      className="w-32 rounded-xl border border-cinema-border bg-cinema-elevated px-2 text-xs font-semibold text-cinema-text focus:border-accent focus:outline-none"
                     >
                       {COUNTRY_CODES.map((item) => (
-                        <option key={item.code} value={item.code}>
+                        <option key={item.code} value={item.code} className="bg-cinema-card text-cinema-text">
                           {item.label}
                         </option>
                       ))}
@@ -426,25 +426,25 @@ export function FirebaseOtpLoginForm({
                         placeholder="98765 43210"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                        className="rounded-xl border-gray-300 bg-gray-50/50 text-gray-900 font-semibold"
+                        className="rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text font-semibold focus:border-accent"
                       />
                     </div>
                   </div>
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-[11px] text-cinema-muted">
                     Firebase will dispatch a 6-digit OTP code to verify your account.
                   </p>
                 </div>
 
                 {/* Test phone filler helper */}
-                <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 flex items-center justify-between">
+                <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/30 text-[11px] text-accent flex items-center justify-between">
                   <span className="flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />
                     <span>Firebase Test: <strong>+91 9876543210</strong></span>
                   </span>
                   <button
                     type="button"
                     onClick={fillTestPhone}
-                    className="px-2 py-0.5 bg-amber-200 hover:bg-amber-300 text-amber-900 font-bold rounded-md transition cursor-pointer"
+                    className="px-2 py-0.5 bg-accent hover:bg-accent-hover text-cinema-bg font-black rounded-md transition cursor-pointer"
                   >
                     Fill
                   </button>
@@ -453,7 +453,7 @@ export function FirebaseOtpLoginForm({
                 <Button
                   type="submit"
                   disabled={isSendingOtp || phone.length < 7}
-                  className="w-full h-11 text-xs font-black bg-gold hover:bg-gold-hover text-gray-950 rounded-2xl shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full h-11 text-xs font-black bg-accent hover:bg-accent-hover text-cinema-bg rounded-2xl shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {isSendingOtp ? (
                     <>
@@ -471,10 +471,10 @@ export function FirebaseOtpLoginForm({
             ) : (
               <form onSubmit={handleVerifyPhoneOtp} className="space-y-5">
                 <div className="text-center space-y-1">
-                  <div className="text-xs font-bold text-gray-800">
+                  <div className="text-xs font-bold text-cinema-text">
                     Enter 6-Digit Code Sent To
                   </div>
-                  <div className="text-sm font-black text-lenstiger font-mono">
+                  <div className="text-sm font-black text-accent font-mono">
                     {formatE164(phone, countryCode)}
                   </div>
                 </div>
@@ -493,20 +493,20 @@ export function FirebaseOtpLoginForm({
                       value={digit}
                       onChange={(e) => handleDigitChange(idx, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(idx, e)}
-                      className="h-12 w-10 sm:h-13 sm:w-11 text-center text-xl font-black rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-lenstiger focus:bg-white focus:outline-none transition-all"
+                      className="h-12 w-10 sm:h-13 sm:w-11 text-center text-xl font-black rounded-xl border-2 border-cinema-border bg-cinema-elevated text-cinema-text focus:border-accent focus:bg-cinema-card focus:outline-none transition-all"
                     />
                   ))}
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-center text-[11px] text-amber-900">
-                  Firebase Test OTP: <strong className="font-mono text-amber-700 font-bold">123456</strong>
+                <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/30 text-center text-[11px] text-accent">
+                  Firebase Test OTP: <strong className="font-mono text-accent-light font-bold">123456</strong>
                 </div>
 
                 <div className="flex items-center justify-between text-xs pt-1">
                   <button
                     type="button"
                     onClick={() => setStep('phone_entry')}
-                    className="text-gray-500 hover:text-gray-800 flex items-center gap-1 font-semibold cursor-pointer"
+                    className="text-cinema-muted hover:text-cinema-text flex items-center gap-1 font-semibold cursor-pointer"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Edit Phone</span>
@@ -518,8 +518,8 @@ export function FirebaseOtpLoginForm({
                     disabled={cooldown > 0 || isSendingOtp}
                     className={`flex items-center gap-1 font-bold cursor-pointer ${
                       cooldown > 0
-                        ? 'text-gray-400 cursor-not-allowed'
-                        : 'text-lenstiger hover:underline'
+                        ? 'text-cinema-muted cursor-not-allowed'
+                        : 'text-accent hover:underline'
                     }`}
                   >
                     <RefreshCw className={`h-3 w-3 ${isSendingOtp ? 'animate-spin' : ''}`} />
@@ -530,7 +530,7 @@ export function FirebaseOtpLoginForm({
                 <Button
                   type="submit"
                   disabled={isVerifyingOtp || otpDigits.join('').length !== 6}
-                  className="w-full h-11 text-xs font-black bg-gold hover:bg-gold-hover text-gray-950 rounded-2xl shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full h-11 text-xs font-black bg-accent hover:bg-accent-hover text-cinema-bg rounded-2xl shadow-sm flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {isVerifyingOtp ? (
                     <>
@@ -549,14 +549,14 @@ export function FirebaseOtpLoginForm({
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-gray-100">
+            <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-cinema-elevated border border-cinema-border">
               <button
                 type="button"
                 onClick={() => switchRole('customer')}
                 className={`py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                   roleTab === 'customer'
-                    ? 'bg-white text-gray-900 shadow-2xs'
-                    : 'text-gray-500 hover:text-gray-900'
+                    ? 'bg-cinema-card text-cinema-text shadow-2xs'
+                    : 'text-cinema-muted hover:text-cinema-text'
                 }`}
               >
                 Customer Login
@@ -566,8 +566,8 @@ export function FirebaseOtpLoginForm({
                 onClick={() => switchRole('admin')}
                 className={`py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                   roleTab === 'admin'
-                    ? 'bg-white text-amber-700 shadow-2xs'
-                    : 'text-gray-500 hover:text-gray-900'
+                    ? 'bg-cinema-card text-accent shadow-2xs'
+                    : 'text-cinema-muted hover:text-cinema-text'
                 }`}
               >
                 Admin Portal
@@ -576,8 +576,8 @@ export function FirebaseOtpLoginForm({
 
             <form onSubmit={handlePasswordLogin} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                  <Mail className="h-3.5 w-3.5 text-lenstiger" />
+                <label className="text-xs font-bold text-cinema-text flex items-center gap-1.5">
+                  <Mail className="h-3.5 w-3.5 text-accent" />
                   <span>Email Address</span>
                 </label>
                 <Input
@@ -585,13 +585,13 @@ export function FirebaseOtpLoginForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="rounded-xl border-gray-300 bg-gray-50/50 text-gray-900"
+                  className="rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text focus:border-accent"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-                  <Lock className="h-3.5 w-3.5 text-lenstiger" />
+                <label className="text-xs font-bold text-cinema-text flex items-center gap-1.5">
+                  <Lock className="h-3.5 w-3.5 text-accent" />
                   <span>Password</span>
                 </label>
                 <Input
@@ -599,13 +599,13 @@ export function FirebaseOtpLoginForm({
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="rounded-xl border-gray-300 bg-gray-50/50 text-gray-900"
+                  className="rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text focus:border-accent"
                 />
               </div>
 
               <Button
                 type="submit"
-                className="w-full h-11 text-xs font-black bg-gold hover:bg-gold-hover text-gray-950 rounded-2xl shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full h-11 text-xs font-black bg-accent hover:bg-accent-hover text-cinema-bg rounded-2xl shadow-sm flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Sign In with Password</span>
                 <ArrowRight className="h-4 w-4" />
@@ -615,8 +615,8 @@ export function FirebaseOtpLoginForm({
         )}
 
         {/* 1-Click Demo Profiles */}
-        <div className="border-t border-gray-100 pt-4 space-y-2">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-gray-400 text-center">
+        <div className="border-t border-cinema-border pt-4 space-y-2">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-cinema-muted text-center">
             Quick 1-Click Demo Profiles
           </div>
 
@@ -624,14 +624,14 @@ export function FirebaseOtpLoginForm({
             <button
               type="button"
               onClick={() => handleInstantLogin('customer')}
-              className="p-2.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-lenstiger-50 hover:border-lenstiger text-xs font-bold text-gray-800 transition cursor-pointer"
+              className="p-2.5 rounded-xl border border-cinema-border bg-cinema-elevated hover:bg-cinema-border hover:border-accent/50 text-xs font-bold text-cinema-text transition cursor-pointer"
             >
               🎬 Demo Customer
             </button>
             <button
               type="button"
               onClick={() => handleInstantLogin('admin')}
-              className="p-2.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-lenstiger-50 hover:border-lenstiger text-xs font-bold text-gray-800 transition cursor-pointer"
+              className="p-2.5 rounded-xl border border-cinema-border bg-cinema-elevated hover:bg-cinema-border hover:border-accent/50 text-xs font-bold text-cinema-text transition cursor-pointer"
             >
               ⚡ Demo Admin
             </button>
@@ -640,8 +640,8 @@ export function FirebaseOtpLoginForm({
       </div>
 
       {/* Explore or Signup footer */}
-      <div className="flex items-center justify-between text-xs text-gray-500 px-2">
-        <Link href="/signup" className="text-lenstiger font-bold hover:underline">
+      <div className="flex items-center justify-between text-xs text-cinema-muted px-2">
+        <Link href="/signup" className="text-accent font-bold hover:underline">
           Create New Account
         </Link>
 
@@ -649,7 +649,7 @@ export function FirebaseOtpLoginForm({
           <button
             type="button"
             onClick={onExploreClick}
-            className="text-gray-600 hover:text-gray-950 font-bold underline cursor-pointer"
+            className="text-cinema-text hover:text-accent font-bold underline cursor-pointer"
           >
             Explore Catalog as Guest →
           </button>

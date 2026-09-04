@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/components/providers/CartProvider';
 import { useLocation } from '@/components/providers/LocationProvider';
 import {
@@ -14,20 +14,19 @@ import {
   Menu,
   X,
   MapPin,
-  Flame,
   ChevronDown,
   Sparkles,
-  Shield,
-  Layers,
   Phone,
   Handshake,
   LogOut,
-  KeyRound,
+  Shield,
+  Layers,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { itemCount, openCart } = useCart();
   const { selectedCity, selectedCityData, openLocationModal } = useLocation();
 
@@ -115,144 +114,172 @@ export function Header() {
     router.push(`/equipment?search=${encodeURIComponent(searchQuery.trim())}`);
   };
 
-  const navCategories = [
+  const handleSignOut = () => {
+    localStorage.removeItem('flexgear_user');
+    localStorage.removeItem('flexgear_auth_token');
+    setCurrentUser(null);
+    setUserDropdownOpen(false);
+    window.dispatchEvent(new Event('storage'));
+    router.push('/');
+  };
+
+  const navLinks = [
+    { name: 'Equipment', href: '/equipment' },
     { name: 'Cameras', href: '/equipment?category=cameras' },
-    { name: 'Lens', href: '/equipment?category=lenses' },
-    { name: 'Combos', href: '/equipment?category=kits' },
-    { name: 'Lights', href: '/equipment?category=lighting' },
-    { name: 'Video & Audio', href: '/equipment?category=audio' },
-    { name: 'Motion Devices', href: '/equipment?category=gimbals' },
+    { name: 'Lenses', href: '/equipment?category=lenses' },
+    { name: 'Lighting', href: '/equipment?category=lighting' },
+    { name: 'Audio', href: '/equipment?category=audio' },
+    { name: 'Kits', href: '/equipment?category=kits' },
+    { name: 'How It Works', href: '/#how-it-works' },
+    { name: 'Partner', href: '/partner' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   return (
     <>
-      {/* Top Hotline Bar */}
-      <div className="bg-[#247565] text-white/90 px-4 py-1 text-[11px] font-medium border-b border-white/10 hidden sm:block">
+      {/* Top Hotline / Hub Banner */}
+      <div className="bg-cinema-bg border-b border-cinema-border/80 text-cinema-text-secondary px-4 py-1.5 text-[11px] hidden sm:block">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-gold" />
-              <span>
-                Hub: <strong>{selectedCityData.name}</strong> • {selectedCityData.address}
-              </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-semantic-success animate-pulse-dot" />
+              <span className="text-cinema-text-muted">Hub:</span>
+              <strong className="text-cinema-text">{selectedCityData.name}</strong>
+              <span className="text-cinema-text-muted hidden md:inline">• {selectedCityData.address}</span>
             </span>
-            <span className="text-white/60">|</span>
-            <span className="text-gold font-bold">⚡ 90-Min Express Set Delivery</span>
+            <span className="text-cinema-border hidden lg:inline">|</span>
+            <span className="text-accent font-semibold hidden lg:inline-flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-accent" />
+              <span>90-Min Express Set Delivery</span>
+            </span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5">
-              <Phone className="w-3 h-3 text-gold" />
-              <span>Call / WhatsApp: <strong>{selectedCityData.phone}</strong></span>
+          <div className="flex items-center gap-5">
+            <span className="flex items-center gap-1.5 text-cinema-text-secondary">
+              <Phone className="w-3 h-3 text-accent" />
+              <span>Support Hotline:</span>
+              <strong className="text-cinema-text">{selectedCityData.phone}</strong>
             </span>
+            <Link
+              href="/partner"
+              className="text-accent hover:text-accent-hover font-bold transition flex items-center gap-1"
+            >
+              <Handshake className="w-3 h-3" />
+              <span>Partner With Us</span>
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Main LensTiger Navbar */}
-      <header className="sticky top-0 z-[1030] bg-lenstiger shadow-md text-white transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
+      {/* Main Luxury Cinematic Navbar */}
+      <header className="sticky top-0 z-30 glass-navbar transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between gap-3 sm:gap-6">
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white flex items-center justify-center text-lenstiger shadow-sm group-hover:scale-105 transition-transform">
-              <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-lenstiger" />
+          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-cinema-surface border border-cinema-border-strong flex items-center justify-center text-accent shadow-cinema-sm group-hover:border-accent group-hover:shadow-cinema-accent transition-all duration-300">
+              <Camera className="w-5 h-5 text-accent" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl sm:text-2xl font-black tracking-tight text-white headingbold flex items-center leading-none">
-                FLEX<span className="text-gold">GEAR</span>
+              <span className="text-xl sm:text-2xl font-black tracking-tight text-cinema-text font-heading flex items-center leading-none">
+                FLEX<span className="text-accent">GEAR</span>
               </span>
-              <span className="text-[9px] tracking-widest text-white/80 font-bold uppercase mt-0.5">
-                Camera Rentals
+              <span className="text-[9px] tracking-[0.2em] text-cinema-text-muted font-bold uppercase mt-0.5">
+                Cinema Rentals
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-5 xl:gap-6 text-sm font-bold text-white">
-            {navCategories.map((cat) => (
-              <Link
-                key={cat.name}
-                href={cat.href}
-                className="hover:text-gold transition-colors py-1 relative group"
-              >
-                {cat.name}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover:w-full" />
-              </Link>
-            ))}
-
-            {/* USED GEAR Button */}
-            <Link
-              href="/equipment?mode=used"
-              className="used-gear-btn px-3.5 py-1.5 flex items-center gap-1.5 shadow-sm"
-            >
-              <Camera className="w-3.5 h-3.5 text-lenstiger" />
-              <span>USED GEAR</span>
-            </Link>
-
-            {/* Location Selector Button */}
-            <button
-              onClick={openLocationModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition border border-white/20 cursor-pointer"
-            >
-              <MapPin className="w-3.5 h-3.5 text-gold" />
-              <span>{selectedCity}</span>
-              <ChevronDown className="w-3 h-3 opacity-70" />
-            </button>
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-6 text-sm font-semibold text-cinema-text-secondary">
+            {navLinks.map((item) => {
+              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`py-1 transition-colors relative hover:text-cinema-text ${
+                    isActive ? 'text-accent font-bold' : ''
+                  }`}
+                >
+                  {item.name}
+                  {isActive && (
+                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-accent rounded-full" />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Right Action Icons (Search, Cart, User) */}
-          <div className="flex items-center gap-2 sm:gap-4">
-            {/* Expandable Search Input */}
+          {/* Right Action Bar (City, Search, Cart, User) */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Location Selector Pill */}
+            <button
+              onClick={openLocationModal}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cinema-surface hover:bg-cinema-tertiary text-cinema-text font-bold text-xs transition border border-cinema-border cursor-pointer shadow-cinema-sm"
+              title="Switch Location"
+            >
+              <MapPin className="w-3.5 h-3.5 text-accent" />
+              <span>{selectedCity}</span>
+              <ChevronDown className="w-3 h-3 text-cinema-text-muted" />
+            </button>
+
+            {/* Expandable Live Search */}
             <div ref={searchContainerRef} className="relative hidden md:block">
               <form
                 onSubmit={handleSearchSubmit}
-                className={`lenstiger-search-box shadow-inner ${searchOpen ? 'active ring-2 ring-gold' : ''}`}
+                className={`flex items-center h-10 rounded-xl bg-cinema-surface border transition-all duration-200 px-3 ${
+                  searchOpen
+                    ? 'w-64 sm:w-72 border-accent ring-2 ring-accent/20 bg-cinema-bg'
+                    : 'w-48 border-cinema-border hover:border-cinema-border-strong'
+                }`}
               >
-                <button
-                  type="button"
-                  onClick={() => setSearchOpen(!searchOpen)}
-                  className="text-lenstiger hover:text-lenstiger-dark p-0.5 flex items-center justify-center shrink-0 cursor-pointer"
-                  aria-label="Search"
-                >
-                  <Search className="w-4 h-4 text-lenstiger" />
-                </button>
+                <Search className="w-4 h-4 text-cinema-text-muted shrink-0" />
                 <input
                   type="text"
                   placeholder="Search cameras, lenses..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setSearchOpen(true)}
-                  className="text-xs text-gray-900 placeholder:text-gray-400 font-medium px-2 py-0.5"
+                  className="w-full bg-transparent text-xs text-cinema-text placeholder:text-cinema-text-muted font-medium px-2.5 py-1 focus:outline-none"
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="text-cinema-text-muted hover:text-cinema-text"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </form>
 
               {/* Predictive Dropdown */}
               {searchOpen && searchResults.length > 0 && (
-                <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden text-gray-900 z-50 p-2 space-y-1">
-                  <div className="text-[10px] font-bold text-gray-400 uppercase px-2 py-1">
-                    Matching Gear
+                <div className="absolute right-0 top-full mt-2 w-80 bg-cinema-surface rounded-xl shadow-cinema-lg border border-cinema-border overflow-hidden z-50 p-2 space-y-1 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="text-[10px] font-bold text-cinema-text-muted uppercase tracking-wider px-2 py-1">
+                    Matching Cinema Gear
                   </div>
                   {searchResults.map((item) => (
                     <Link
                       key={item.id}
                       href={`/equipment/${item.id}`}
                       onClick={() => setSearchOpen(false)}
-                      className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-lenstiger-50 transition"
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-cinema-tertiary transition group"
                     >
-                      <div className="w-8 h-8 rounded bg-gray-100 relative overflow-hidden shrink-0">
+                      <div className="w-10 h-10 rounded-lg bg-cinema-bg border border-cinema-border relative overflow-hidden shrink-0 flex items-center justify-center p-1">
                         <Image
-                          src={item.image_url || '/placeholder.jpg'}
+                          src={item.image_url || 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=200'}
                           alt={item.name}
                           fill
                           className="object-contain"
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs font-bold text-gray-900 truncate">
+                        <div className="text-xs font-bold text-cinema-text truncate group-hover:text-accent transition-colors">
                           {item.name}
                         </div>
-                        <div className="text-[11px] text-lenstiger font-semibold">
-                          ₹{item.daily_price}/day
+                        <div className="text-[11px] text-accent font-semibold">
+                          ₹{item.daily_price?.toLocaleString()}/day
                         </div>
                       </div>
                     </Link>
@@ -264,209 +291,158 @@ export function Header() {
             {/* Shopping Cart Icon Trigger */}
             <button
               onClick={openCart}
-              className="relative p-2 text-white hover:text-gold transition cursor-pointer"
+              className="relative p-2.5 rounded-xl bg-cinema-surface hover:bg-cinema-tertiary border border-cinema-border text-cinema-text hover:text-accent transition cursor-pointer shadow-cinema-sm"
               aria-label="Shopping Cart"
             >
-              <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="absolute -top-0.5 -right-0.5 bg-rose-500 text-white font-extrabold text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 shadow-sm border border-white">
-                {itemCount}
-              </span>
+              <ShoppingBag className="w-5 h-5" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-accent text-cinema-bg font-black text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 shadow-cinema-sm animate-in zoom-in">
+                  {itemCount}
+                </span>
+              )}
             </button>
 
             {/* User Profile Dropdown */}
             <div ref={userDropdownRef} className="relative">
-              <button
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="p-2 text-white hover:text-gold transition flex items-center gap-1 cursor-pointer"
-                aria-label="User menu"
-              >
-                <User className="w-5 h-5 sm:w-6 sm:h-6" />
-                <ChevronDown className="w-3 h-3 hidden sm:block opacity-80" />
-              </button>
+              {currentUser ? (
+                <button
+                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-cinema-surface hover:bg-cinema-tertiary border border-cinema-border text-cinema-text transition cursor-pointer shadow-cinema-sm"
+                  aria-label="User account menu"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-accent/15 border border-accent/30 text-accent flex items-center justify-center text-xs font-bold">
+                    {currentUser.full_name?.charAt(0) || <User className="w-4 h-4" />}
+                  </div>
+                  <span className="text-xs font-bold text-cinema-text hidden sm:inline max-w-[100px] truncate">
+                    {currentUser.full_name?.split(' ')[0] || 'Filmmaker'}
+                  </span>
+                  <ChevronDown className="w-3 h-3 text-cinema-text-muted hidden sm:block" />
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent hover:bg-accent-hover text-cinema-bg font-bold text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 shadow-cinema-sm"
+                >
+                  <User className="w-3.5 h-3.5" />
+                  <span>Sign In</span>
+                </Link>
+              )}
 
-              {userDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden text-gray-900 z-50 py-1 divide-y divide-gray-100 animate-in fade-in zoom-in-95 duration-150">
-                  {currentUser ? (
-                    <>
-                      <div className="px-4 py-2.5 bg-gray-50/70">
-                        <p className="text-xs font-bold text-gray-900 truncate">
-                          {currentUser.full_name || 'Filmmaker'}
-                        </p>
-                        <p className="text-[11px] text-gray-500 truncate font-mono">
-                          {currentUser.email || currentUser.phone || 'User'}
-                        </p>
-                        <div className="mt-1">
-                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-lenstiger/10 text-lenstiger">
-                            {currentUser.role || 'CUSTOMER'}
-                          </span>
-                        </div>
-                      </div>
+              {/* User Dropdown Menu */}
+              {userDropdownOpen && currentUser && (
+                <div className="absolute right-0 top-full mt-2 w-60 bg-cinema-surface rounded-xl shadow-cinema-lg border border-cinema-border overflow-hidden z-50 py-1 divide-y divide-cinema-border animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-4 py-3 bg-cinema-tertiary/50">
+                    <p className="text-xs font-bold text-cinema-text truncate">
+                      {currentUser.full_name || 'Filmmaker'}
+                    </p>
+                    <p className="text-[11px] text-cinema-text-muted truncate font-mono mt-0.5">
+                      {currentUser.phone || currentUser.email || 'User'}
+                    </p>
+                    <div className="mt-2 flex items-center gap-1.5">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-accent/15 text-accent border border-accent/30">
+                        <Sparkles className="w-2.5 h-2.5" />
+                        <span>{currentUser.role || 'CUSTOMER'}</span>
+                      </span>
+                    </div>
+                  </div>
 
-                      <div className="py-1 text-xs font-semibold">
-                        <Link
-                          href="/account"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-gray-700 hover:text-lenstiger"
-                        >
-                          <User className="w-3.5 h-3.5 text-lenstiger" />
-                          <span>My Profile &amp; KYC</span>
-                        </Link>
-                        <Link
-                          href="/rentals"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-gray-700 hover:text-lenstiger"
-                        >
-                          <Layers className="w-3.5 h-3.5 text-lenstiger" />
-                          <span>My Rentals &amp; Bookings</span>
-                        </Link>
-                        <Link
-                          href="/partner"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-gray-700 hover:text-lenstiger"
-                        >
-                          <Handshake className="w-3.5 h-3.5 text-lenstiger" />
-                          <span>Partner With FlexGear</span>
-                        </Link>
-                      </div>
+                  <div className="py-1">
+                    <Link
+                      href="/account"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-cinema-text hover:bg-cinema-tertiary hover:text-accent transition"
+                    >
+                      <User className="w-4 h-4 text-cinema-text-muted" />
+                      <span>My Profile &amp; Bookings</span>
+                    </Link>
+                    <Link
+                      href="/account/kyc"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-cinema-text hover:bg-cinema-tertiary hover:text-accent transition"
+                    >
+                      <Shield className="w-4 h-4 text-cinema-text-muted" />
+                      <span>Zero-Deposit KYC</span>
+                    </Link>
+                    {currentUser.role === 'ADMIN' && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-accent hover:bg-cinema-tertiary transition"
+                      >
+                        <Layers className="w-4 h-4" />
+                        <span>Admin Management</span>
+                      </Link>
+                    )}
+                  </div>
 
-                      <div className="py-1 text-xs">
-                        <Link
-                          href="/admin"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 text-amber-600 font-bold"
-                        >
-                          <span>Admin Portal</span>
-                          <span className="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">
-                            PRO
-                          </span>
-                        </Link>
-                      </div>
-
-                      <div className="py-1 text-xs">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (typeof window !== 'undefined') {
-                              localStorage.removeItem('flexgear_user');
-                              window.dispatchEvent(new Event('storage'));
-                            }
-                            setCurrentUser(null);
-                            setUserDropdownOpen(false);
-                            router.push('/');
-                          }}
-                          className="w-full flex items-center gap-2 px-4 py-2 hover:bg-rose-50 text-rose-600 font-bold text-left cursor-pointer"
-                        >
-                          <LogOut className="w-3.5 h-3.5" />
-                          <span>Sign Out</span>
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="px-4 py-3 bg-gray-50/70">
-                        <p className="text-xs font-bold text-gray-900">Welcome to FlexGear</p>
-                        <p className="text-[11px] text-gray-500">Sign in with Firebase OTP to book gear.</p>
-                      </div>
-
-                      <div className="p-2 space-y-1.5 text-xs font-bold">
-                        <Link
-                          href="/login"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-lenstiger hover:bg-lenstiger-dark text-white shadow-2xs"
-                        >
-                          <Phone className="w-3.5 h-3.5" />
-                          <span>Sign In with OTP</span>
-                        </Link>
-                        <Link
-                          href="/signup"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-800"
-                        >
-                          <User className="w-3.5 h-3.5" />
-                          <span>Create Account</span>
-                        </Link>
-                      </div>
-                    </>
-                  )}
+                  <div className="py-1">
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-semantic-error hover:bg-cinema-tertiary transition cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Mobile Hamburger Button */}
+            {/* Mobile Hamburger Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-white hover:text-gold lg:hidden transition"
-              aria-label="Toggle menu"
+              className="lg:hidden p-2 rounded-xl bg-cinema-surface border border-cinema-border text-cinema-text hover:text-accent transition cursor-pointer"
+              aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-lenstiger-dark border-t border-white/10 px-4 py-4 space-y-3 animate-in slide-in-from-top-2 duration-200">
-            {/* Mobile Location Selector */}
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                openLocationModal();
-              }}
-              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-white/10 text-white font-bold text-xs"
-            >
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-gold" />
-                <span>Selected Location: {selectedCity}</span>
-              </div>
-              <span className="text-gold underline">Change</span>
-            </button>
-
+          <div className="lg:hidden bg-cinema-bg/95 backdrop-blur-xl border-b border-cinema-border px-4 py-5 space-y-4 animate-in slide-in-from-top duration-200">
             {/* Mobile Search */}
-            <form onSubmit={handleSearchSubmit} className="flex gap-2">
+            <form onSubmit={handleSearchSubmit} className="flex items-center h-11 rounded-xl bg-cinema-surface border border-cinema-border px-3">
+              <Search className="w-4 h-4 text-cinema-text-muted shrink-0" />
               <input
                 type="text"
-                placeholder="Search gear..."
+                placeholder="Search cameras, lenses, lighting..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-white text-gray-900 px-3 py-2 rounded-xl text-xs font-medium focus:outline-none"
+                className="w-full bg-transparent text-xs text-cinema-text placeholder:text-cinema-text-muted px-2.5 focus:outline-none"
               />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-gold text-gray-950 font-bold rounded-xl text-xs"
-              >
-                Search
-              </button>
             </form>
 
-            {/* Mobile Category Links */}
-            <div className="grid grid-cols-2 gap-2 pt-2 text-xs font-bold">
-              {navCategories.map((cat) => (
+            {/* Nav Links Grid */}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              {navLinks.map((item) => (
                 <Link
-                  key={cat.name}
-                  href={cat.href}
+                  key={item.name}
+                  href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2.5 rounded-lg bg-white/5 hover:bg-white/15 text-white transition block"
+                  className="px-3.5 py-2.5 rounded-xl bg-cinema-surface border border-cinema-border/60 text-xs font-bold text-cinema-text hover:border-accent hover:text-accent transition"
                 >
-                  {cat.name}
+                  {item.name}
                 </Link>
               ))}
             </div>
 
-            <div className="pt-2 border-t border-white/10 flex gap-2">
-              <Link
-                href="/equipment?mode=used"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex-1 used-gear-btn py-2 text-center text-xs block"
+            {/* Hub info & contact */}
+            <div className="pt-3 border-t border-cinema-border flex items-center justify-between text-xs text-cinema-text-secondary">
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-accent" />
+                <span>Hub: <strong>{selectedCity}</strong></span>
+              </span>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  openLocationModal();
+                }}
+                className="text-accent font-bold hover:underline"
               >
-                USED GEAR
-              </Link>
-              <Link
-                href="/partner"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex-1 bg-gold text-gray-950 py-2 text-center text-xs font-bold rounded-full block"
-              >
-                Partner with FG
-              </Link>
+                Change Hub →
+              </button>
             </div>
           </div>
         )}

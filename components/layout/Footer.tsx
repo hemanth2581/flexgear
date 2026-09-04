@@ -2,215 +2,235 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Camera, MapPin, Phone, Mail, Youtube, Instagram, Facebook, ShieldCheck, Sparkles, Smartphone } from 'lucide-react';
+import { Camera, MapPin, Phone, Mail, Youtube, Instagram, Facebook, ShieldCheck, Sparkles, Smartphone, ArrowUpRight, Award, Clock, Truck } from 'lucide-react';
 import { useLocation } from '@/components/providers/LocationProvider';
 
 export function Footer() {
   const { setCity } = useLocation();
 
   return (
-    <footer className="bg-black text-white pt-14 pb-20 border-t border-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {/* Column 1: Logo & About Us */}
-          <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-lenstiger flex items-center justify-center text-white">
-                <Camera className="w-5 h-5" />
+    <footer className="bg-cinema-bg text-cinema-text pt-16 pb-24 border-t border-cinema-border relative overflow-hidden">
+      {/* Subtle background glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-accent/5 blur-3xl pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        {/* Top Trust Pillars Banner */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 rounded-2xl bg-cinema-surface border border-cinema-border mb-12 shadow-cinema-md">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/25 flex items-center justify-center text-accent shrink-0">
+              <Camera className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-cinema-text">Optical Calibration</div>
+              <div className="text-[11px] text-cinema-text-muted">Sensor cleaned & tested</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/25 flex items-center justify-center text-accent shrink-0">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-cinema-text">90-Min On-Set Delivery</div>
+              <div className="text-[11px] text-cinema-text-muted">Direct to production sets</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/25 flex items-center justify-center text-accent shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-cinema-text">Zero-Deposit KYC</div>
+              <div className="text-[11px] text-cinema-text-muted">For verified creators</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/25 flex items-center justify-center text-accent shrink-0">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-cinema-text">24/7 Shoot Hotline</div>
+              <div className="text-[11px] text-cinema-text-muted">Emergency backup gear</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Multi-Column Footer Links */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+          {/* Col 1 & 2: Brand Story & Hubs */}
+          <div className="lg:col-span-2 space-y-4">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-cinema-surface border border-cinema-border-strong flex items-center justify-center text-accent shadow-cinema-sm">
+                <Camera className="w-5 h-5 text-accent" />
               </div>
-              <span className="text-xl font-black tracking-tight text-white headingbold">
-                FLEX<span className="text-gold">GEAR</span>
+              <span className="text-2xl font-black tracking-tight text-cinema-text font-heading flex items-center leading-none">
+                FLEX<span className="text-accent">GEAR</span>
               </span>
             </Link>
 
-            <div className="space-y-2">
-              <h5 className="text-sm font-bold text-white uppercase tracking-wider">About Us</h5>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                FlexGear is a Premium Camera, Lens & Production Gear Rental Company located in the cities of Chennai, Bengaluru, Coimbatore & Hyderabad. 100% verified equipment and express on-set delivery.
-              </p>
-            </div>
+            <p className="text-xs text-cinema-text-secondary leading-relaxed max-w-sm">
+              FlexGear is South India’s premier cinema camera, anamorphic lens, and film production gear rental marketplace. Built for independent filmmakers, production houses, and commercial directors across Chennai, Bengaluru, Coimbatore, and Hyderabad.
+            </p>
 
             {/* Social Icons */}
             <div className="flex items-center gap-2 pt-2">
               <a
-                href="https://facebook.com"
+                href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:bg-lenstiger hover:border-lenstiger transition"
-                aria-label="Facebook"
+                className="w-9 h-9 rounded-xl bg-cinema-surface border border-cinema-border flex items-center justify-center text-cinema-text-muted hover:text-accent hover:border-accent transition"
+                aria-label="Instagram"
               >
-                <Facebook className="w-4 h-4" />
+                <Instagram className="w-4 h-4" />
               </a>
               <a
                 href="https://youtube.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:bg-lenstiger hover:border-lenstiger transition"
+                className="w-9 h-9 rounded-xl bg-cinema-surface border border-cinema-border flex items-center justify-center text-cinema-text-muted hover:text-accent hover:border-accent transition"
                 aria-label="YouTube"
               >
                 <Youtube className="w-4 h-4" />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-9 h-9 rounded-lg border border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:bg-lenstiger hover:border-lenstiger transition"
-                aria-label="Instagram"
+                className="w-9 h-9 rounded-xl bg-cinema-surface border border-cinema-border flex items-center justify-center text-cinema-text-muted hover:text-accent hover:border-accent transition"
+                aria-label="Facebook"
               >
-                <Instagram className="w-4 h-4" />
+                <Facebook className="w-4 h-4" />
               </a>
             </div>
           </div>
 
-          {/* Column 2: Quick Links */}
-          <div className="space-y-4">
-            <h5 className="text-sm font-bold text-white uppercase tracking-wider">Quick Links</h5>
-            <ul className="space-y-2.5 text-xs text-gray-400">
+          {/* Col 3: Explore Cinema Gear */}
+          <div className="space-y-3">
+            <h5 className="text-xs font-bold text-accent uppercase tracking-widest font-heading">Cinema Catalog</h5>
+            <ul className="space-y-2 text-xs text-cinema-text-secondary">
               <li>
-                <Link href="/about" className="hover:text-lenstiger-light transition">
-                  About Us
+                <Link href="/equipment?category=cameras" className="hover:text-accent transition">
+                  Cinema &amp; Mirrorless Cameras
                 </Link>
               </li>
               <li>
-                <Link href="/equipment" className="hover:text-lenstiger-light transition">
-                  All Rental Gear
+                <Link href="/equipment?category=lenses" className="hover:text-accent transition">
+                  Cinema Primes &amp; Zooms
                 </Link>
               </li>
               <li>
-                <Link href="/equipment?mode=used" className="hover:text-lenstiger-light transition">
-                  Buy / Sell Used Gear
+                <Link href="/equipment?category=lighting" className="hover:text-accent transition">
+                  Aputure &amp; Nanlite Studio LEDs
                 </Link>
               </li>
               <li>
-                <Link href="/partner" className="hover:text-lenstiger-light transition">
-                  Partner with FlexGear
+                <Link href="/equipment?category=audio" className="hover:text-accent transition">
+                  Sennheiser &amp; Rode 32-Bit Audio
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-lenstiger-light transition">
-                  Privacy Policy & Terms
-                </Link>
-              </li>
-            </ul>
-
-            {/* Mobile App Callout */}
-            <div className="pt-2">
-              <h6 className="text-xs font-bold text-white mb-2 flex items-center gap-1.5">
-                <Smartphone className="w-3.5 h-3.5 text-gold" />
-                <span>Download Mobile App</span>
-              </h6>
-              <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-900 border border-gray-700 text-gray-300 text-xs">
-                <span className="font-bold text-white">Google Play</span> • Android App Ready
-              </div>
-            </div>
-          </div>
-
-          {/* Column 3: My Account */}
-          <div className="space-y-4">
-            <h5 className="text-sm font-bold text-white uppercase tracking-wider">My Account</h5>
-            <ul className="space-y-2.5 text-xs text-gray-400">
-              <li>
-                <Link href="/cart" className="hover:text-lenstiger-light transition">
-                  View Shopping Cart
+                <Link href="/equipment?category=gimbals" className="hover:text-accent transition">
+                  DJI Ronin Gimbals &amp; Sliders
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-lenstiger-light transition">
-                  Client Login / Register
-                </Link>
-              </li>
-              <li>
-                <Link href="/rentals" className="hover:text-lenstiger-light transition">
-                  Booking History & Invoices
-                </Link>
-              </li>
-              <li>
-                <Link href="/account" className="hover:text-lenstiger-light transition">
-                  KYC Verification Center
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-lenstiger-light transition">
-                  Contact Support 24/7
+                <Link href="/equipment?category=kits" className="hover:text-accent transition">
+                  Full Production Shooting Kits
                 </Link>
               </li>
             </ul>
-
-            <div className="p-3 rounded-xl bg-gray-900 border border-gray-800 text-xs text-gray-400 space-y-1">
-              <div className="font-bold text-white flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-lenstiger" />
-                <span>Zero Security Deposit</span>
-              </div>
-              <p className="text-[11px] text-gray-400">
-                Verified professionals enjoy instant equipment release with zero hold deposit.
-              </p>
-            </div>
           </div>
 
-          {/* Column 4: Store Hubs & Contact */}
-          <div className="space-y-4">
-            <h5 className="text-sm font-bold text-white uppercase tracking-wider">Get In Touch</h5>
-            <ul className="space-y-2 text-xs text-gray-400">
-              <li className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-lenstiger shrink-0 mt-0.5" />
-                <span>
-                  <strong className="text-gray-200">Chennai Hub:</strong> No 20, 88th Street, Ashok Nagar, Chennai - 600083
-                </span>
+          {/* Col 4: Company & Policies */}
+          <div className="space-y-3">
+            <h5 className="text-xs font-bold text-accent uppercase tracking-widest font-heading">Company &amp; Trust</h5>
+            <ul className="space-y-2 text-xs text-cinema-text-secondary">
+              <li>
+                <Link href="/about" className="hover:text-accent transition">
+                  About FlexGear
+                </Link>
               </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-lenstiger shrink-0 mt-0.5" />
-                <span>
-                  <strong className="text-gray-200">Bengaluru Hub:</strong> 6/1, 1st Main Rd, BTM Layout, Bengaluru - 560068
-                </span>
+              <li>
+                <Link href="/partner" className="hover:text-accent transition flex items-center gap-1 text-accent font-semibold">
+                  <span>Partner With FlexGear</span>
+                  <ArrowUpRight className="w-3 h-3" />
+                </Link>
               </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 text-lenstiger shrink-0 mt-0.5" />
-                <span>
-                  <strong className="text-gray-200">Coimbatore Hub:</strong> No.22, 2nd St Ext, Gandhipuram, Coimbatore - 641012
-                </span>
+              <li>
+                <Link href="/account/kyc" className="hover:text-accent transition">
+                  Zero-Deposit KYC Process
+                </Link>
               </li>
-              <li className="flex items-center gap-2 pt-2 text-gray-300">
-                <Phone className="w-3.5 h-3.5 text-gold shrink-0" />
-                <span>Chennai: +91 98840 39091</span>
+              <li>
+                <Link href="/contact" className="hover:text-accent transition">
+                  Contact &amp; Studio Quotes
+                </Link>
               </li>
-              <li className="flex items-center gap-2 text-gray-300">
-                <Phone className="w-3.5 h-3.5 text-gold shrink-0" />
-                <span>Bengaluru: +91 78457 91178</span>
+              <li>
+                <Link href="/privacy" className="hover:text-accent transition">
+                  Rental Policy &amp; Terms
+                </Link>
               </li>
-              <li className="flex items-center gap-2 text-gray-300">
-                <Phone className="w-3.5 h-3.5 text-gold shrink-0" />
-                <span>Coimbatore: +91 88380 51796</span>
+            </ul>
+          </div>
+
+          {/* Col 5: Production Hubs */}
+          <div className="space-y-3">
+            <h5 className="text-xs font-bold text-accent uppercase tracking-widest font-heading">Hub Locations</h5>
+            <ul className="space-y-2.5 text-xs text-cinema-text-secondary">
+              <li className="space-y-0.5">
+                <div className="flex items-center gap-1.5 text-cinema-text font-bold">
+                  <MapPin className="w-3.5 h-3.5 text-accent" />
+                  <span>Chennai Hub</span>
+                </div>
+                <div className="text-[11px] text-cinema-text-muted pl-5">Ashok Nagar • +91 98840 39091</div>
               </li>
-              <li className="flex items-center gap-2 pt-1 text-gray-300">
-                <Mail className="w-3.5 h-3.5 text-gold shrink-0" />
-                <span>contact@flexgear.rentals</span>
+              <li className="space-y-0.5">
+                <div className="flex items-center gap-1.5 text-cinema-text font-bold">
+                  <MapPin className="w-3.5 h-3.5 text-accent" />
+                  <span>Bengaluru Hub</span>
+                </div>
+                <div className="text-[11px] text-cinema-text-muted pl-5">BTM Layout • +91 78457 91178</div>
+              </li>
+              <li className="space-y-0.5">
+                <div className="flex items-center gap-1.5 text-cinema-text font-bold">
+                  <MapPin className="w-3.5 h-3.5 text-accent" />
+                  <span>Coimbatore Hub</span>
+                </div>
+                <div className="text-[11px] text-cinema-text-muted pl-5">Gandhipuram • +91 88380 51796</div>
+              </li>
+              <li className="space-y-0.5">
+                <div className="flex items-center gap-1.5 text-cinema-text font-bold">
+                  <MapPin className="w-3.5 h-3.5 text-accent" />
+                  <span>Hyderabad Hub</span>
+                </div>
+                <div className="text-[11px] text-cinema-text-muted pl-5">Jubilee Hills • +91 98840 39091</div>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom Copyright */}
-        <div className="pt-8 border-t border-gray-800 text-center text-xs text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+        {/* Bottom Bar: Copyright & Location Switcher */}
+        <div className="pt-8 border-t border-cinema-border flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-cinema-text-muted">
           <p>
-            Copyright © 2026{' '}
-            <span className="text-lenstiger font-bold">FlexGear Rentals</span>. All Rights Reserved.
+            © 2026 <strong className="text-cinema-text font-bold">FlexGear Rentals</strong>. All Rights Reserved. Professional Cinema Equipment.
           </p>
-          <div className="flex items-center gap-4 text-gray-400">
-            <button onClick={() => setCity('Chennai')} className="hover:text-lenstiger">
-              Chennai
-            </button>
-            <span>•</span>
-            <button onClick={() => setCity('Bengaluru')} className="hover:text-lenstiger">
-              Bengaluru
-            </button>
-            <span>•</span>
-            <button onClick={() => setCity('Coimbatore')} className="hover:text-lenstiger">
-              Coimbatore
-            </button>
-            <span>•</span>
-            <button onClick={() => setCity('Hyderabad')} className="hover:text-lenstiger">
-              Hyderabad
-            </button>
+
+          <div className="flex items-center gap-3 text-xs">
+            <span className="text-cinema-text-disabled">Active Hub:</span>
+            {['Chennai', 'Bengaluru', 'Coimbatore', 'Hyderabad'].map((city, idx) => (
+              <React.Fragment key={city}>
+                {idx > 0 && <span className="text-cinema-border">•</span>}
+                <button
+                  onClick={() => setCity(city)}
+                  className="text-cinema-text-secondary hover:text-accent font-semibold transition cursor-pointer"
+                >
+                  {city}
+                </button>
+              </React.Fragment>
+            ))}
           </div>
         </div>
       </div>

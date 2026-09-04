@@ -54,110 +54,110 @@ export default async function AccountDashboardPage() {
   return (
     <div className="space-y-8">
       {/* KYC Status Banner */}
-      <div className="rounded-3xl border border-lenstiger/20 bg-white p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="rounded-3xl border border-cinema-border bg-cinema-card p-6 shadow-cinema flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-lenstiger-50 text-lenstiger border border-lenstiger/30 shrink-0">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent border border-accent/30 shrink-0">
             <ShieldCheck className="h-6 w-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-gray-900 headingbold">Verified Cinematographer KYC Tier</h2>
-              <Badge className="bg-lenstiger text-white font-bold text-[10px]">
-                Active & Verified
+              <h2 className="text-base font-bold text-cinema-text headingbold">Verified Cinematographer KYC Tier</h2>
+              <Badge className="bg-accent text-cinema-bg font-black text-[10px]">
+                Active &amp; Verified
               </Badge>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Government ID verified (Aadhaar & Production GST) • Eligible for instant zero-deposit gear dispatch
+            <p className="text-xs text-cinema-muted mt-0.5">
+              Government ID verified (Aadhaar &amp; Production GST) • Eligible for instant zero-deposit gear dispatch
             </p>
           </div>
         </div>
 
-        <div className="text-right sm:border-l sm:border-gray-200 sm:pl-6 shrink-0">
-          <div className="text-[10px] uppercase font-bold text-gray-400">Current Deposit in Escrow</div>
-          <div className="text-xl font-black text-lenstiger font-mono">{formatCurrency(totalEscrow)}</div>
+        <div className="text-right sm:border-l sm:border-cinema-border sm:pl-6 shrink-0">
+          <div className="text-[10px] uppercase font-bold text-cinema-muted">Current Deposit in Escrow</div>
+          <div className="text-xl font-black text-accent font-mono">{formatCurrency(totalEscrow)}</div>
         </div>
       </div>
 
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-3xl border border-gray-200 bg-white p-5 space-y-1 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-gray-400 font-semibold uppercase">
+        <div className="rounded-3xl border border-cinema-border bg-cinema-card p-5 space-y-1 shadow-cinema">
+          <div className="flex items-center justify-between text-xs text-cinema-muted font-semibold uppercase">
             <span>Upcoming Shoots</span>
-            <Calendar className="h-4 w-4 text-lenstiger" />
+            <Calendar className="h-4 w-4 text-accent" />
           </div>
-          <div className="text-3xl font-black text-gray-900">{upcomingRentals.length}</div>
-          <div className="text-[11px] text-gray-500">Confirmed & Ready for Pickup</div>
+          <div className="text-3xl font-black text-cinema-text">{upcomingRentals.length}</div>
+          <div className="text-[11px] text-cinema-muted">Confirmed &amp; Ready for Pickup</div>
         </div>
 
-        <div className="rounded-3xl border border-gray-200 bg-white p-5 space-y-1 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-gray-400 font-semibold uppercase">
+        <div className="rounded-3xl border border-cinema-border bg-cinema-card p-5 space-y-1 shadow-cinema">
+          <div className="flex items-center justify-between text-xs text-cinema-muted font-semibold uppercase">
             <span>Active on Set</span>
-            <Film className="h-4 w-4 text-lenstiger" />
+            <Film className="h-4 w-4 text-accent" />
           </div>
-          <div className="text-3xl font-black text-lenstiger">{activeRentals.length}</div>
-          <div className="text-[11px] text-gray-500">Currently deployed equipment</div>
+          <div className="text-3xl font-black text-accent">{activeRentals.length}</div>
+          <div className="text-[11px] text-cinema-muted">Currently deployed equipment</div>
         </div>
 
-        <div className="rounded-3xl border border-gray-200 bg-white p-5 space-y-1 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-gray-400 font-semibold uppercase">
+        <div className="rounded-3xl border border-cinema-border bg-cinema-card p-5 space-y-1 shadow-cinema">
+          <div className="flex items-center justify-between text-xs text-cinema-muted font-semibold uppercase">
             <span>Completed Rentals</span>
-            <Clock className="h-4 w-4 text-gray-400" />
+            <Clock className="h-4 w-4 text-cinema-muted" />
           </div>
-          <div className="text-3xl font-black text-gray-900">{completedRentals.length}</div>
-          <div className="text-[11px] text-gray-500">Past shoot productions</div>
+          <div className="text-3xl font-black text-cinema-text">{completedRentals.length}</div>
+          <div className="text-[11px] text-cinema-muted">Past shoot productions</div>
         </div>
       </div>
 
       {/* Recent Bookings Section */}
-      <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+      <div className="rounded-3xl border border-cinema-border bg-cinema-card p-6 shadow-cinema space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base font-black text-gray-900 headingbold">Recent Equipment Bookings</h3>
-            <p className="text-xs text-gray-500">Manage your active reservations and download GST tax invoices</p>
+            <h3 className="text-base font-black text-cinema-text headingbold">Recent Equipment Bookings</h3>
+            <p className="text-xs text-cinema-muted">Manage your active reservations and download GST tax invoices</p>
           </div>
-          <Link href="/account/rentals" className="text-xs font-bold text-lenstiger hover:underline flex items-center gap-1">
+          <Link href="/account/rentals" className="text-xs font-bold text-accent hover:underline flex items-center gap-1">
             <span>View All</span>
             <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="rounded-2xl border border-cinema-border overflow-hidden">
           <Table>
-            <TableHeader className="bg-gray-50">
-              <TableRow className="border-gray-200 text-xs">
-                <TableHead className="font-bold text-gray-700">Booking ID</TableHead>
-                <TableHead className="font-bold text-gray-700">Shoot Schedule</TableHead>
-                <TableHead className="font-bold text-gray-700">Status</TableHead>
-                <TableHead className="font-bold text-gray-700">Deposit</TableHead>
-                <TableHead className="font-bold text-gray-700 text-right">Total (Incl. Tax)</TableHead>
-                <TableHead className="font-bold text-gray-700 text-center">Action</TableHead>
+            <TableHeader className="bg-cinema-elevated">
+              <TableRow className="border-cinema-border text-xs">
+                <TableHead className="font-bold text-cinema-text">Booking ID</TableHead>
+                <TableHead className="font-bold text-cinema-text">Shoot Schedule</TableHead>
+                <TableHead className="font-bold text-cinema-text">Status</TableHead>
+                <TableHead className="font-bold text-cinema-text">Deposit</TableHead>
+                <TableHead className="font-bold text-cinema-text text-right">Total (Incl. Tax)</TableHead>
+                <TableHead className="font-bold text-cinema-text text-center">Action</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="text-xs divide-y divide-gray-100">
+            <TableBody className="text-xs divide-y divide-cinema-border">
               {rentals.slice(0, 5).map((r) => (
-                <TableRow key={r.id} className="border-gray-100 hover:bg-gray-50/60">
-                  <TableCell className="font-mono font-bold text-gray-900">
-                    <Link href={`/rentals/${r.id}`} className="hover:text-lenstiger">
+                <TableRow key={r.id} className="border-cinema-border hover:bg-cinema-elevated/60">
+                  <TableCell className="font-mono font-bold text-cinema-text">
+                    <Link href={`/rentals/${r.id}`} className="hover:text-accent">
                       {r.rental_id || r.id.slice(0, 8)}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-gray-600">
+                  <TableCell className="text-cinema-muted">
                     {r.start_date} → {r.end_date}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="font-semibold text-[10px] border-gray-300">
+                    <Badge variant="outline" className="font-semibold text-[10px] border-cinema-border text-cinema-text">
                       {r.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-gray-600">
+                  <TableCell className="text-cinema-muted">
                     {formatCurrency(r.security_deposit || 0)}
                   </TableCell>
-                  <TableCell className="text-right font-black text-lenstiger">
+                  <TableCell className="text-right font-black text-accent">
                     {formatCurrency(r.total || 0)}
                   </TableCell>
                   <TableCell className="text-center">
                     <Link href={`/rentals/${r.id}`}>
-                      <Button variant="ghost" size="sm" className="h-7 text-xs text-lenstiger hover:bg-lenstiger-50">
+                      <Button variant="ghost" size="sm" className="h-7 text-xs text-accent hover:bg-accent/15">
                         <Eye className="h-3.5 w-3.5 mr-1" />
                         <span>View</span>
                       </Button>

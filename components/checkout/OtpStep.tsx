@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/toast';
 import { ShieldCheck, Phone, RefreshCw, ArrowLeft, ArrowRight, CheckCircle2, Lock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 interface OtpStepProps {
   phone: string;
@@ -122,7 +121,6 @@ export function OtpStep({ phone, onOtpVerified, onBack }: OtpStepProps) {
       }
     } catch (e) {
       console.error(e);
-      // Fallback demo token
       const demoToken = 'demo-otp-token-' + Date.now();
       setVerifiedToken(demoToken);
       toast('Verified with Demo Mode', 'success');
@@ -133,25 +131,25 @@ export function OtpStep({ phone, onOtpVerified, onBack }: OtpStepProps) {
   };
 
   return (
-    <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6 max-w-md mx-auto">
+    <div className="bg-cinema-surface p-6 sm:p-8 rounded-3xl border border-cinema-border shadow-cinema-sm space-y-6 max-w-md mx-auto text-cinema-text">
       <div className="text-center space-y-2">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-lenstiger-50 text-lenstiger shadow-xs">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 border border-accent/30 text-accent shadow-cinema-glow">
           <Phone className="h-7 w-7" />
         </div>
-        <h3 className="text-xl font-black text-gray-900 headingbold">Verify Your Phone Number</h3>
-        <p className="text-xs text-gray-500">
+        <h3 className="text-xl font-black text-cinema-text font-heading">Verify Your Phone Number</h3>
+        <p className="text-xs text-cinema-text-secondary">
           Enter the 6-digit verification code sent to{' '}
-          <strong className="text-gray-900">+91 {phone}</strong>
+          <strong className="text-cinema-text font-mono">+91 {phone}</strong>
         </p>
       </div>
 
       {/* Demo Hint Banner */}
-      <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center justify-between">
-        <span className="flex items-center gap-1.5">
-          <Lock className="w-3.5 h-3.5 text-amber-600" />
-          <span>Firebase / Demo Verification Code:</span>
+      <div className="p-3.5 rounded-2xl bg-accent/10 border border-accent/25 text-xs text-accent flex items-center justify-between">
+        <span className="flex items-center gap-1.5 font-semibold">
+          <Lock className="w-3.5 h-3.5" />
+          <span>Demo Verification Code:</span>
         </span>
-        <code className="font-mono font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-lg">123456</code>
+        <code className="font-mono font-bold bg-accent/20 px-2 py-0.5 rounded-lg">123456</code>
       </div>
 
       {/* 6 Digit Input Boxes */}
@@ -169,7 +167,7 @@ export function OtpStep({ phone, onOtpVerified, onBack }: OtpStepProps) {
             value={digit}
             onChange={(e) => handleDigitChange(idx, e.target.value)}
             onKeyDown={(e) => handleKeyDown(idx, e)}
-            className="h-12 w-10 sm:h-14 sm:w-12 text-center text-xl font-black rounded-2xl border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-lenstiger focus:bg-white focus:outline-none transition-all"
+            className="h-12 w-10 sm:h-14 sm:w-12 text-center text-xl font-black rounded-2xl border border-cinema-border bg-cinema-tertiary text-cinema-text focus:border-accent focus:bg-cinema-card focus:outline-none transition-all font-mono"
           />
         ))}
       </div>
@@ -182,15 +180,15 @@ export function OtpStep({ phone, onOtpVerified, onBack }: OtpStepProps) {
           disabled={cooldown > 0 || isSending}
           className={`flex items-center gap-1 font-semibold ${
             cooldown > 0
-              ? 'text-gray-400 cursor-not-allowed'
-              : 'text-lenstiger hover:underline'
+              ? 'text-cinema-text-muted cursor-not-allowed'
+              : 'text-accent hover:underline cursor-pointer'
           }`}
         >
           <RefreshCw className={`h-3 w-3 ${isSending ? 'animate-spin' : ''}`} />
           <span>{cooldown > 0 ? `Resend Code in ${cooldown}s` : 'Resend Code Now'}</span>
         </button>
 
-        <span className="text-[11px] text-gray-400">KYC Fast-Track</span>
+        <span className="text-[11px] text-accent font-semibold">Zero-Deposit KYC</span>
       </div>
 
       {/* Buttons */}
@@ -199,7 +197,7 @@ export function OtpStep({ phone, onOtpVerified, onBack }: OtpStepProps) {
           type="button"
           variant="outline"
           onClick={onBack}
-          className="flex-1 rounded-2xl border-gray-300 text-gray-700"
+          className="flex-1 rounded-xl border-cinema-border bg-cinema-tertiary text-cinema-text hover:bg-cinema-card"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           <span>Back</span>
@@ -209,7 +207,7 @@ export function OtpStep({ phone, onOtpVerified, onBack }: OtpStepProps) {
           type="button"
           onClick={handleVerify}
           disabled={isVerifying || otp.join('').length !== 6}
-          className="flex-1 rounded-2xl bg-gold hover:bg-gold-hover text-gray-950 font-black"
+          className="flex-1 rounded-xl bg-accent hover:bg-accent-hover text-cinema-bg font-black uppercase text-xs tracking-wider shadow-cinema-accent"
         >
           <span>{isVerifying ? 'Verifying...' : 'Verify OTP'}</span>
           <ArrowRight className="h-4 w-4 ml-1" />

@@ -57,7 +57,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${manrope.variable} ${inter.variable}`}>
-      <body className="min-h-screen bg-[#f3f3f3] font-sans text-gray-900 antialiased flex flex-col selection:bg-lenstiger selection:text-white">
+      <body className="min-h-screen bg-cinema-bg font-sans text-cinema-text antialiased flex flex-col selection:bg-accent selection:text-cinema-bg bg-mesh-dark">
         <ToastProvider>
           <LocationProvider>
             <CartProvider>
