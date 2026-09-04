@@ -319,7 +319,7 @@ export function FirebaseOtpLoginForm({
                   </label>
 
                   <div className="relative flex items-center">
-                    <span className="absolute left-3.5 text-xs text-cinema-muted font-bold font-mono">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs text-cinema-muted font-bold font-mono pointer-events-none select-none z-10">
                       +91
                     </span>
                     <Input
@@ -330,7 +330,8 @@ export function FirebaseOtpLoginForm({
                       maxLength={10}
                       value={phone}
                       onChange={(e) => setPhone(cleanPhone(e.target.value))}
-                      className="pl-13 h-12 rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text font-mono text-sm tracking-wider focus:border-accent"
+                      style={{ paddingLeft: '3.75rem' }}
+                      className="h-12 rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text font-mono text-sm tracking-wider focus:border-accent"
                     />
                   </div>
                   <p className="text-[11px] text-cinema-muted">

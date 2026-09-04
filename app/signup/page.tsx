@@ -215,14 +215,17 @@ export default function SignupPage() {
             </div>
 
             <div className="flex gap-2">
-              <div className="relative flex-1">
-                <span className="absolute left-3 top-2.5 text-xs text-cinema-muted font-semibold">+91</span>
+              <div className="relative flex-1 flex items-center">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-cinema-muted font-bold font-mono pointer-events-none select-none z-10">
+                  +91
+                </span>
                 <Input
                   type="tel"
                   placeholder="98765 43210"
                   maxLength={10}
                   disabled={isPhoneVerified}
-                  className="pl-12 rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text font-mono"
+                  style={{ paddingLeft: '3.75rem' }}
+                  className="rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text font-mono"
                   value={phone}
                   onChange={(e) => setPhone(cleanPhone(e.target.value))}
                 />
