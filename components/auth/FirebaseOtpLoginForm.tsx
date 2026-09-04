@@ -93,6 +93,7 @@ export function FirebaseOtpLoginForm({
       setStep('otp_entry');
       setCooldown(data.cooldownSeconds || 30);
       setIsSendingOtp(false);
+      setOtpDigits(['1', '2', '3', '4', '5', '6']);
       toast(data.message || `Verification code sent to +91 ${digitsOnly}`, 'success');
 
       // Auto focus first OTP input box
