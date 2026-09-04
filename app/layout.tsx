@@ -9,6 +9,7 @@ import { Footer } from "@/components/layout/Footer";
 import { LocationModal } from "@/components/layout/LocationModal";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { StickyCartBar } from "@/components/cart/StickyCartBar";
+import { NavigationProgressBar } from "@/components/layout/NavigationProgressBar";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -58,6 +59,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${manrope.variable} ${inter.variable}`}>
       <body className="min-h-screen bg-cinema-bg font-sans text-cinema-text antialiased flex flex-col selection:bg-accent selection:text-cinema-bg bg-mesh-dark">
+        <NavigationProgressBar />
         <ToastProvider>
           <LocationProvider>
             <CartProvider>

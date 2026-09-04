@@ -4,8 +4,7 @@ import { notFound } from 'next/navigation';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { ProductDetailView } from '@/components/equipment/ProductDetailView';
 
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // 1-minute edge cache with background revalidation
 
 interface EquipmentDetailsPageProps {
   params: {

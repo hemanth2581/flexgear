@@ -37,12 +37,16 @@ import {
   Clock,
 } from 'lucide-react';
 
+// In-memory module cache for instantaneous 0ms page switching back to home
+let memoryCachedEquipment: Equipment[] | null = null;
+let memoryCachedCategories: { id: string; slug: string; name: string }[] | null = null;
+
 export default function HomePage() {
   const { selectedCity, selectedCityData, openLocationModal } = useLocation();
 
-  const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
-  const [categories, setCategories] = useState<{ id: string; slug: string; name: string }[]>([]);
-  const [loadingGear, setLoadingGear] = useState(true);
+  const [equipmentList, setEquipmentList] = useState<Equipment[]>(memoryCachedEquipment || []);
+  const [categories, setCategories] = useState<{ id: string; slug: string; name: string }[]>(memoryCachedCategories || []);
+  const [loadingGear, setLoadingGear] = useState(!memoryCachedEquipment);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedEquipmentForPricing, setSelectedEquipmentForPricing] = useState<Equipment | null>(null);
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
@@ -71,11 +75,13 @@ export default function HomePage() {
     return () => window.removeEventListener('storage', checkUser);
   }, []);
 
-  // Fetch real equipment & categories from live Supabase PostgreSQL on mount
+  // Fetch real equipment & categories from live Supabase PostgreSQL on mount (non-blocking if cached)
   useEffect(() => {
     async function loadData() {
       try {
-        setLoadingGear(true);
+        if (!memoryCachedEquipment) {
+          setLoadingGear(true);
+        }
         const [eqRes, catRes] = await Promise.all([
           supabase
             .from('equipment')
@@ -89,10 +95,12 @@ export default function HomePage() {
             .order('name'),
         ]);
 
-        if (eqRes.data) {
+        if (eqRes.data && eqRes.data.length > 0) {
+          memoryCachedEquipment = eqRes.data as any;
           setEquipmentList(eqRes.data as any);
         }
-        if (catRes.data) {
+        if (catRes.data && catRes.data.length > 0) {
+          memoryCachedCategories = catRes.data as any;
           setCategories(catRes.data as any);
         }
       } catch (err) {

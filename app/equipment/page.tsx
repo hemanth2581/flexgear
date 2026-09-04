@@ -5,7 +5,7 @@ import { EquipmentCatalogView } from '@/components/equipment/EquipmentCatalogVie
 import { Category, Brand, Equipment } from '@/types/equipment';
 import { Sparkles, SlidersHorizontal, Camera } from 'lucide-react';
 
-export const revalidate = 0; // Dynamic route
+export const revalidate = 60; // ISR cache with background revalidation
 
 interface EquipmentPageProps {
   searchParams: {

@@ -1,10 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  compress: true,
+  poweredByHeader: false,
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      'date-fns',
+      'framer-motion',
+      '@supabase/supabase-js',
+      'recharts',
+    ],
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
   images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 604800, // 7 days cache
     remotePatterns: [
       {
         protocol: 'https',
@@ -18,6 +31,15 @@ const nextConfig = {
   },
   async headers() {
     return [
+      {
+        source: '/:all*(svg|jpg|jpeg|png|webp|avif|woff2|ico)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       {
         source: '/:path*',
         headers: [

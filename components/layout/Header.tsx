@@ -175,7 +175,7 @@ export function Header() {
       <header className="sticky top-0 z-30 glass-navbar transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between gap-3 sm:gap-6">
           {/* Brand Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+          <Link href="/" prefetch={true} className="flex items-center gap-2.5 group shrink-0">
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-cinema-surface border border-cinema-border-strong flex items-center justify-center text-accent shadow-cinema-sm group-hover:border-accent group-hover:shadow-cinema-accent transition-all duration-300">
               <Camera className="w-5 h-5 text-accent" />
             </div>
@@ -197,6 +197,7 @@ export function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
+                  prefetch={true}
                   className={`py-1 transition-colors relative hover:text-cinema-text ${
                     isActive ? 'text-accent font-bold' : ''
                   }`}
@@ -420,6 +421,7 @@ export function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
+                  prefetch={true}
                   onClick={() => setMobileMenuOpen(false)}
                   className="px-3.5 py-2.5 rounded-xl bg-cinema-surface border border-cinema-border/60 text-xs font-bold text-cinema-text hover:border-accent hover:text-accent transition"
                 >

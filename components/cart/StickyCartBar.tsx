@@ -11,13 +11,13 @@ export function StickyCartBar() {
   return (
     <>
       {/* Floating Partner with FlexGear Pill */}
-      <Link href="/partner" className="partner-btn group">
+      <Link href="/partner" prefetch={true} className="partner-btn group">
         <Handshake className="w-4 h-4" />
         <span>Partner with FlexGear</span>
       </Link>
 
       {/* Floating Sell/Buy Used Gear Pill */}
-      <Link href="/equipment?mode=used" className="sell-product-btn group">
+      <Link href="/equipment?mode=used" prefetch={true} className="sell-product-btn group">
         <Flame className="w-4 h-4 text-gold" />
         <span>Sell / Buy Gear</span>
       </Link>

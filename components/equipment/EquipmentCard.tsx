@@ -93,6 +93,7 @@ export function EquipmentCard({
       {/* Product Image Stage */}
       <Link
         href={`/equipment/${equipment.id}`}
+        prefetch={true}
         className="block relative aspect-square w-full mb-3.5 rounded-xl overflow-hidden bg-cinema-bg border border-cinema-border/60 flex items-center justify-center p-3 group/img"
       >
         <Image
@@ -114,7 +115,7 @@ export function EquipmentCard({
         <span className="text-[11px] text-cinema-text-muted font-medium uppercase tracking-wider block mb-1">
           {equipment.category?.name || 'Cinema Equipment'}
         </span>
-        <Link href={`/equipment/${equipment.id}`}>
+        <Link href={`/equipment/${equipment.id}`} prefetch={true}>
           <h3 className="text-sm sm:text-base font-bold text-cinema-text font-heading line-clamp-2 min-h-[2.75rem] group-hover:text-accent transition-colors">
             {equipment.name}
           </h3>
