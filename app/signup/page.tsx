@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/toast';
@@ -9,25 +9,13 @@ import {
   Lock,
   Mail,
   User,
-  Phone,
   ArrowRight,
-  ShieldCheck,
   Smartphone,
   RefreshCw,
   CheckCircle2,
-  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';
-import {
-  createRecaptchaVerifier,
-  sendFirebaseOtp,
-  confirmFirebaseOtp,
-  formatE164,
-  getFirebaseErrorMessage,
-} from '@/lib/firebase/phone-auth';
-import { isFirebaseConfigured } from '@/lib/firebase/client';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -43,108 +31,129 @@ export default function SignupPage() {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [otpCode, setOtpCode] = useState('');
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (recaptchaVerifierRef.current) {
-        try {
-          recaptchaVerifierRef.current.clear();
-        } catch (e) {}
-      }
-    };
-  }, []);
+  const cleanPhone = (p: string) => p.replace(/\D/g, '').slice(-10);
 
   const handleSendOtp = async () => {
-    const cleanPhone = phone.replace(/\D/g, '');
-    if (cleanPhone.length < 10) {
-      toast('Please enter a valid 10-digit mobile number', 'error');
+    const digits = cleanPhone(phone);
+    if (digits.length !== 10 || !/^[6-9]\d{9}$/.test(digits)) {
+      toast('Please enter a valid 10-digit Indian mobile number', 'error');
       return;
     }
 
-    const fullPhone = formatE164(cleanPhone, '+91');
     setIsSendingOtp(true);
 
     try {
-      if (!recaptchaVerifierRef.current) {
-        recaptchaVerifierRef.current = createRecaptchaVerifier('signup-recaptcha', {
-          size: 'invisible',
-        });
+      const res = await fetch('/api/auth/otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: digits }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        toast(data.error || 'Failed to dispatch OTP. Please try again.', 'error');
+        setIsSendingOtp(false);
+        return;
       }
 
-      const confirmation = await sendFirebaseOtp(fullPhone, recaptchaVerifierRef.current);
-      setConfirmationResult(confirmation);
       setIsVerifyingPhone(true);
       setIsSendingOtp(false);
-      toast(`Firebase OTP dispatched to ${fullPhone}`, 'success');
+      toast(data.message || `Verification code sent to +91 ${digits}`, 'success');
     } catch (error: any) {
       console.error('[Signup Phone Auth] Error:', error);
       setIsSendingOtp(false);
-      toast(getFirebaseErrorMessage(error), 'error');
+      toast('Network error sending verification code.', 'error');
     }
   };
 
   const handleVerifyOtp = async () => {
-    if (otpCode.length !== 6) {
+    if (otpCode.trim().length !== 6) {
       toast('Please enter the 6-digit OTP code', 'error');
       return;
     }
 
     setIsLoading(true);
+    const digits = cleanPhone(phone);
+
     try {
-      if (confirmationResult && isFirebaseConfigured()) {
-        await confirmFirebaseOtp(confirmationResult, otpCode);
-      } else {
-        if (otpCode !== '123456') {
-          throw new Error('Invalid test OTP code. Use 123456.');
-        }
+      const res = await fetch('/api/auth/otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: digits,
+          otp: otpCode.trim(),
+          fullName,
+          email,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setIsLoading(false);
+        toast(data.error || 'Invalid or expired OTP code.', 'error');
+        return;
       }
 
       setIsPhoneVerified(true);
       setIsVerifyingPhone(false);
       setIsLoading(false);
-      toast('Mobile number verified successfully with Firebase!', 'success');
+      toast('Mobile number verified successfully!', 'success');
+
+      if (data.user) {
+        localStorage.setItem('flexgear_user', JSON.stringify(data.user));
+        if (data.token) {
+          localStorage.setItem('flexgear_auth_token', data.token);
+        }
+        window.dispatchEvent(new Event('storage'));
+      }
     } catch (error: any) {
       setIsLoading(false);
-      toast(getFirebaseErrorMessage(error), 'error');
+      toast('Error verifying code. Please try again.', 'error');
     }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !email || !password) {
+    if (!fullName || !email) {
       toast('Please fill in all required fields', 'error');
+      return;
+    }
+
+    const digits = cleanPhone(phone);
+    if (!isPhoneVerified && digits.length === 10) {
+      toast('Please verify your mobile number with OTP first', 'error');
       return;
     }
 
     setIsLoading(true);
 
     const userObj = {
-      id: `user_${Date.now()}`,
+      id: `user_${digits || Date.now()}`,
       full_name: fullName,
       email,
-      phone: phone ? `+91${phone.replace(/\D/g, '')}` : undefined,
+      phone: digits ? `+91${digits}` : undefined,
       phone_verified: isPhoneVerified,
       role: 'CUSTOMER',
-      token: `jwt_signup_${Date.now()}`,
+      token: `flexgear_session_${Date.now()}`,
     };
 
     if (typeof window !== 'undefined') {
       localStorage.setItem('flexgear_user', JSON.stringify(userObj));
+      window.dispatchEvent(new Event('storage'));
     }
 
     setTimeout(() => {
       setIsLoading(false);
       toast('Account created successfully! Welcome to FlexGear.', 'success');
       router.push('/account');
-    }, 500);
+    }, 400);
   };
 
   return (
     <div className="bg-cinema-bg min-h-screen py-16 text-cinema-text">
-      <div id="signup-recaptcha"></div>
-
       <div className="mx-auto max-w-md px-4 space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -154,15 +163,15 @@ export default function SignupPage() {
           <h1 className="text-2xl sm:text-3xl font-black text-cinema-text font-heading">
             Create Filmmaker Account
           </h1>
-          <p className="text-xs text-cinema-text-secondary">
+          <p className="text-xs text-cinema-muted">
             Start renting cinema gear, saving custom kits, and tracking shoot logistics.
           </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSignup} className="rounded-3xl border border-cinema-border bg-cinema-surface p-6 sm:p-8 space-y-4 shadow-cinema-sm">
+        <form onSubmit={handleSignup} className="rounded-3xl border border-cinema-border bg-cinema-surface p-6 sm:p-8 space-y-4 shadow-cinema-xl">
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-cinema-text-secondary flex items-center gap-1.5">
+            <label className="text-xs font-bold text-cinema-muted flex items-center gap-1.5">
               <User className="h-3.5 w-3.5 text-accent" />
               <span>Full Name</span>
             </label>
@@ -171,12 +180,12 @@ export default function SignupPage() {
               placeholder="Arjun Menon"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="rounded-xl border-cinema-border bg-cinema-tertiary text-cinema-text"
+              className="rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-cinema-text-secondary flex items-center gap-1.5">
+            <label className="text-xs font-bold text-cinema-muted flex items-center gap-1.5">
               <Mail className="h-3.5 w-3.5 text-accent" />
               <span>Email Address</span>
             </label>
@@ -186,15 +195,15 @@ export default function SignupPage() {
               placeholder="arjun@cinemafilm.in"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-xl border-cinema-border bg-cinema-tertiary text-cinema-text"
+              className="rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text"
             />
           </div>
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-cinema-text-secondary flex items-center gap-1.5">
+              <label className="text-xs font-bold text-cinema-muted flex items-center gap-1.5">
                 <Smartphone className="h-3.5 w-3.5 text-accent" />
-                <span>Mobile Phone (For OTP Verification)</span>
+                <span>Mobile Phone (For SMS OTP)</span>
               </label>
               {isPhoneVerified && (
                 <span className="text-[11px] font-bold text-semantic-success flex items-center gap-1">
@@ -205,24 +214,24 @@ export default function SignupPage() {
 
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <span className="absolute left-3 top-2.5 text-xs text-cinema-text-muted font-semibold">+91</span>
+                <span className="absolute left-3 top-2.5 text-xs text-cinema-muted font-semibold">+91</span>
                 <Input
                   type="tel"
                   placeholder="98765 43210"
                   maxLength={10}
                   disabled={isPhoneVerified}
-                  className="pl-12 rounded-xl border-cinema-border bg-cinema-tertiary text-cinema-text font-mono"
+                  className="pl-12 rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text font-mono"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => setPhone(cleanPhone(e.target.value))}
                 />
               </div>
 
-              {!isPhoneVerified && phone.length >= 10 && (
+              {!isPhoneVerified && cleanPhone(phone).length === 10 && (
                 <Button
                   type="button"
                   onClick={handleSendOtp}
                   disabled={isSendingOtp}
-                  className="rounded-xl bg-accent hover:bg-accent-hover text-cinema-bg font-bold text-xs shrink-0 px-3"
+                  className="rounded-xl bg-accent hover:bg-accent-hover text-cinema-bg font-bold text-xs shrink-0 px-4"
                 >
                   {isSendingOtp ? (
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -233,17 +242,16 @@ export default function SignupPage() {
               )}
             </div>
 
-            {/* OTP Entry Drawer if verifying phone */}
+            {/* OTP Entry Box */}
             {isVerifyingPhone && !isPhoneVerified && (
               <div className="p-3.5 bg-accent/10 rounded-2xl border border-accent/25 space-y-2 mt-2">
                 <div className="text-xs font-bold text-accent flex items-center justify-between">
-                  <span>Enter SMS OTP:</span>
-                  <span className="text-[10px] text-cinema-text-muted font-mono">Demo: 123456</span>
+                  <span>Enter 6-Digit SMS Code:</span>
                 </div>
                 <div className="flex gap-2">
                   <Input
                     type="text"
-                    placeholder="6-digit code"
+                    placeholder="123456"
                     maxLength={6}
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
@@ -263,31 +271,30 @@ export default function SignupPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-cinema-text-secondary flex items-center gap-1.5">
+            <label className="text-xs font-bold text-cinema-muted flex items-center gap-1.5">
               <Lock className="h-3.5 w-3.5 text-accent" />
-              <span>Create Password</span>
+              <span>Password</span>
             </label>
             <Input
               type="password"
-              required
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-xl border-cinema-border bg-cinema-tertiary text-cinema-text"
+              className="rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text"
             />
           </div>
 
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-12 text-xs uppercase tracking-wider font-black bg-accent hover:bg-accent-hover text-cinema-bg rounded-xl shadow-cinema-accent flex items-center justify-center gap-2 mt-2"
+            className="w-full h-12 text-xs uppercase tracking-wider font-black bg-accent hover:bg-accent-hover text-cinema-bg rounded-xl shadow-cinema-accent flex items-center justify-center gap-2 mt-2 cursor-pointer"
           >
             <span>{isLoading ? 'Creating Account...' : 'Complete Registration'}</span>
             <ArrowRight className="h-4 w-4" />
           </Button>
         </form>
 
-        <div className="text-center text-xs text-cinema-text-muted">
+        <div className="text-center text-xs text-cinema-muted">
           Already have an account?{' '}
           <Link href="/login" className="text-accent font-bold hover:underline">
             Sign In with Phone OTP →

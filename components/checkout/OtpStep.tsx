@@ -143,15 +143,6 @@ export function OtpStep({ phone, onOtpVerified, onBack }: OtpStepProps) {
         </p>
       </div>
 
-      {/* Demo Hint Banner */}
-      <div className="p-3.5 rounded-2xl bg-accent/10 border border-accent/25 text-xs text-accent flex items-center justify-between">
-        <span className="flex items-center gap-1.5 font-semibold">
-          <Lock className="w-3.5 h-3.5" />
-          <span>Demo Verification Code:</span>
-        </span>
-        <code className="font-mono font-bold bg-accent/20 px-2 py-0.5 rounded-lg">123456</code>
-      </div>
-
       {/* 6 Digit Input Boxes */}
       <div
         className="flex justify-center gap-2 sm:gap-3 py-2"

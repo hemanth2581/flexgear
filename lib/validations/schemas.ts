@@ -3,7 +3,14 @@ import { z } from 'zod';
 export const PhoneSchema = z
   .string()
   .trim()
-  .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number');
+  .refine(
+    (val) => {
+      const digits = val.replace(/\D/g, '');
+      const tenDigits = digits.slice(-10);
+      return /^[6-9]\d{9}$/.test(tenDigits) && (digits.length === 10 || (digits.length === 12 && digits.startsWith('91')));
+    },
+    { message: 'Please enter a valid 10-digit Indian mobile number (e.g. 9876543210 or +919876543210)' }
+  );
 
 export const SendOtpSchema = z.object({
   phone: PhoneSchema,

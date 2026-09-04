@@ -10,37 +10,14 @@ import {
   Mail,
   ArrowRight,
   Shield,
-  User,
   Smartphone,
   CheckCircle2,
-  Sparkles,
   RefreshCw,
-  HelpCircle,
-  Key,
   ArrowLeft,
-  Flame,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ConfirmationResult, RecaptchaVerifier } from 'firebase/auth';
-import {
-  createRecaptchaVerifier,
-  sendFirebaseOtp,
-  confirmFirebaseOtp,
-  formatE164,
-  getFirebaseErrorMessage,
-} from '@/lib/firebase/phone-auth';
-import { isFirebaseConfigured } from '@/lib/firebase/client';
-import { FirebaseConsoleGuideModal } from '@/components/auth/FirebaseConsoleGuideModal';
-
-const COUNTRY_CODES = [
-  { code: '+91', label: '🇮🇳 India (+91)' },
-  { code: '+1', label: '🇺🇸 USA / CA (+1)' },
-  { code: '+44', label: '🇬🇧 UK (+44)' },
-  { code: '+971', label: '🇦🇪 UAE (+971)' },
-  { code: '+65', label: '🇸🇬 Singapore (+65)' },
-  { code: '+61', label: '🇦🇺 Australia (+61)' },
-];
 
 interface FirebaseOtpLoginFormProps {
   onSuccessRedirect?: string;
@@ -62,25 +39,18 @@ export function FirebaseOtpLoginForm({
   const [authMethod, setAuthMethod] = useState<'phone' | 'password'>('phone');
   const [roleTab, setRoleTab] = useState<'customer' | 'admin'>('customer');
 
-  // Password State
-  const [email, setEmail] = useState('customer@flexgear.test');
-  const [password, setPassword] = useState('password123');
-
-  // Phone OTP State
-  const [countryCode, setCountryCode] = useState('+91');
-  const [phone, setPhone] = useState('9876543210');
+  // Customer Phone OTP State
+  const [phone, setPhone] = useState('');
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [step, setStep] = useState<'phone_entry' | 'otp_entry'>('phone_entry');
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [cooldown, setCooldown] = useState(0);
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
 
-  // Recaptcha verifier ref
-  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
-
-  // Guide Modal State
-  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  // Admin / Password State
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoggingInPassword, setIsLoggingInPassword] = useState(false);
 
   // Cooldown countdown timer
   useEffect(() => {
@@ -91,91 +61,52 @@ export function FirebaseOtpLoginForm({
     return () => clearInterval(timer);
   }, [cooldown]);
 
-  // Clean up recaptcha on unmount
-  useEffect(() => {
-    return () => {
-      if (recaptchaVerifierRef.current) {
-        try {
-          recaptchaVerifierRef.current.clear();
-        } catch (e) {}
-      }
-    };
-  }, []);
+  const cleanPhone = (val: string) => val.replace(/\D/g, '').slice(-10);
 
-  const switchRole = (tab: 'customer' | 'admin') => {
-    setRoleTab(tab);
-    if (tab === 'customer') {
-      setEmail('customer@flexgear.test');
-      setPassword('password123');
-    } else {
-      setEmail('admin@flexgear.test');
-      setPassword('password123');
-    }
-  };
-
-  const cleanPhone = (val: string) => val.replace(/\D/g, '');
-
-  // Step 1: Send Firebase OTP
+  // Step 1: Send Server-Side OTP
   const handleSendPhoneOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
     const digitsOnly = cleanPhone(phone);
-    if (digitsOnly.length < 7) {
-      toast('Please enter a valid mobile number', 'error');
+    if (digitsOnly.length !== 10 || !/^[6-9]\d{9}$/.test(digitsOnly)) {
+      toast('Please enter a valid 10-digit Indian mobile number (starts with 6, 7, 8, or 9)', 'error');
       return;
     }
 
-    const fullPhoneE164 = formatE164(digitsOnly, countryCode);
     setIsSendingOtp(true);
 
     try {
-      if (!isFirebaseConfigured()) {
-        setTimeout(() => {
-          setIsSendingOtp(false);
-          setStep('otp_entry');
-          setCooldown(30);
-          setOtpDigits(['1', '2', '3', '4', '5', '6']);
-          toast(
-            `Firebase Demo Mode: OTP 123456 generated for ${fullPhoneE164}. Add keys in .env.local for live SMS!`,
-            'info'
-          );
-        }, 500);
+      const res = await fetch('/api/auth/otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: digitsOnly }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        toast(data.error || 'Failed to dispatch OTP. Please try again.', 'error');
+        setIsSendingOtp(false);
         return;
       }
 
-      // Initialize Firebase Recaptcha
-      if (!recaptchaVerifierRef.current) {
-        recaptchaVerifierRef.current = createRecaptchaVerifier('root-recaptcha-container', {
-          size: 'invisible',
-          'expired-callback': () => {
-            toast('reCAPTCHA expired. Please try again.', 'error');
-          },
-        });
-      }
-
-      const confirmation = await sendFirebaseOtp(fullPhoneE164, recaptchaVerifierRef.current);
-      setConfirmationResult(confirmation);
       setStep('otp_entry');
-      setCooldown(30);
+      setCooldown(data.cooldownSeconds || 30);
       setIsSendingOtp(false);
-      toast(`Firebase OTP sent to ${fullPhoneE164}!`, 'success');
+      toast(data.message || `Verification code sent to +91 ${digitsOnly}`, 'success');
+
+      // Auto focus first OTP input box
+      setTimeout(() => {
+        document.getElementById('form-otp-0')?.focus();
+      }, 100);
     } catch (error: any) {
-      console.error('[Firebase Phone Auth] Send OTP Error:', error);
+      console.error('[Phone Auth] Send OTP Error:', error);
       setIsSendingOtp(false);
-
-      if (recaptchaVerifierRef.current) {
-        try {
-          recaptchaVerifierRef.current.clear();
-          recaptchaVerifierRef.current = null;
-        } catch (e) {}
-      }
-
-      const userMsg = getFirebaseErrorMessage(error);
-      toast(userMsg, 'error');
+      toast('Network error sending OTP. Please check your connection.', 'error');
     }
   };
 
-  // Step 2: Verify Firebase OTP
+  // Step 2: Verify Server-Side OTP & Establish Supabase Session
   const handleVerifyPhoneOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
@@ -186,40 +117,45 @@ export function FirebaseOtpLoginForm({
     }
 
     setIsVerifyingOtp(true);
-    const fullPhoneE164 = formatE164(phone, countryCode);
+    const digitsOnly = cleanPhone(phone);
 
     try {
-      let firebaseUid = `user_phone_${cleanPhone(phone)}_${Date.now()}`;
-      let idToken = `mock_token_${Date.now()}`;
+      const res = await fetch('/api/auth/otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: digitsOnly,
+          otp: otpCode,
+        }),
+      });
 
-      if (confirmationResult && isFirebaseConfigured()) {
-        const userCredential = await confirmFirebaseOtp(confirmationResult, otpCode);
-        const fbUser = userCredential.user;
-        firebaseUid = fbUser.uid;
-        idToken = await fbUser.getIdToken();
-      } else {
-        if (otpCode !== '123456') {
-          throw new Error('Invalid test code. Please use 123456.');
-        }
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        toast(data.error || 'Invalid or expired OTP code. Please try again.', 'error');
+        setIsVerifyingOtp(false);
+        return;
       }
 
-      const role = 'CUSTOMER';
-      const userObj = {
-        id: firebaseUid,
-        phone: fullPhoneE164,
-        email: `${cleanPhone(phone)}@flexgear.user`,
-        full_name: `Filmmaker (+${countryCode.replace('+', '')} ${cleanPhone(phone)})`,
-        role,
-        token: idToken,
-        auth_provider: 'firebase_phone',
+      const userObj = data.user || {
+        id: `user_${digitsOnly}`,
+        phone: `+91${digitsOnly}`,
+        email: `${digitsOnly}@flexgear.customer`,
+        full_name: `Filmmaker (+91 ${digitsOnly})`,
+        role: 'CUSTOMER',
+        token: data.token,
       };
 
       if (typeof window !== 'undefined') {
         localStorage.setItem('flexgear_user', JSON.stringify(userObj));
+        if (data.token) {
+          localStorage.setItem('flexgear_auth_token', data.token);
+        }
+        window.dispatchEvent(new Event('storage'));
       }
 
       setIsVerifyingOtp(false);
-      toast(`Authenticated with Firebase Phone OTP! Welcome, Filmmaker.`, 'success');
+      toast(data.message || 'Authenticated successfully! Welcome to FlexGear.', 'success');
 
       if (onSuccess) {
         onSuccess(userObj);
@@ -227,10 +163,9 @@ export function FirebaseOtpLoginForm({
         router.push(onSuccessRedirect);
       }
     } catch (error: any) {
-      console.error('[Firebase Phone Auth] Verify OTP Error:', error);
+      console.error('[Phone Auth] Verify OTP Error:', error);
       setIsVerifyingOtp(false);
-      const userMsg = getFirebaseErrorMessage(error);
-      toast(userMsg, 'error');
+      toast('Verification failed. Please try again.', 'error');
     }
   };
 
@@ -269,6 +204,7 @@ export function FirebaseOtpLoginForm({
     nextInput?.focus();
   };
 
+  // Admin / Email Login
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
@@ -276,213 +212,164 @@ export function FirebaseOtpLoginForm({
       return;
     }
 
-    const role = email.toLowerCase().includes('admin') || roleTab === 'admin' ? 'ADMIN' : 'CUSTOMER';
-    const userObj = {
-      id: role === 'ADMIN' ? '00000000-0000-0000-0000-000000000002' : '00000000-0000-0000-0000-000000000001',
-      email,
-      full_name: role === 'ADMIN' ? 'FlexGear Admin' : 'Arjun Menon (Cinematographer)',
-      role,
-      token: `mock_jwt_${role.toLowerCase()}_${Date.now()}`,
-    };
+    setIsLoggingInPassword(true);
 
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('flexgear_user', JSON.stringify(userObj));
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        toast(data.error || 'Invalid email or password.', 'error');
+        setIsLoggingInPassword(false);
+        return;
+      }
+
+      const userObj = data.user;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('flexgear_user', JSON.stringify(userObj));
+        if (data.token) {
+          localStorage.setItem('flexgear_auth_token', data.token);
+        }
+        window.dispatchEvent(new Event('storage'));
+      }
+
+      setIsLoggingInPassword(false);
+      toast(`Signed in as ${userObj.role === 'ADMIN' ? 'Administrator' : 'Customer'}`, 'success');
+
+      if (onSuccess) {
+        onSuccess(userObj);
+      } else {
+        router.push(userObj.role === 'ADMIN' ? '/admin' : onSuccessRedirect);
+      }
+    } catch (error: any) {
+      console.error('[Password Auth] Error:', error);
+      setIsLoggingInPassword(false);
+      toast('Authentication error. Please try again.', 'error');
     }
-
-    toast(`Signed in as ${role === 'ADMIN' ? 'Admin' : 'Customer'} (${email})`, 'success');
-    if (onSuccess) {
-      onSuccess(userObj);
-    } else {
-      router.push(role === 'ADMIN' ? '/admin' : onSuccessRedirect);
-    }
-  };
-
-  const handleInstantLogin = (role: 'customer' | 'admin') => {
-    const userObj = {
-      id: role === 'admin' ? '00000000-0000-0000-0000-000000000002' : '00000000-0000-0000-0000-000000000001',
-      email: role === 'admin' ? 'admin@flexgear.test' : 'customer@flexgear.test',
-      full_name: role === 'admin' ? 'FlexGear Admin' : 'Arjun Menon (Cinematographer)',
-      role: role.toUpperCase(),
-      token: `mock_jwt_${role}_${Date.now()}`,
-    };
-
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('flexgear_user', JSON.stringify(userObj));
-    }
-
-    toast(`Instant Sign-in as ${role.toUpperCase()}!`, 'success');
-    if (onSuccess) {
-      onSuccess(userObj);
-    } else {
-      router.push(role === 'admin' ? '/admin' : onSuccessRedirect);
-    }
-  };
-
-  const fillTestPhone = () => {
-    setCountryCode('+91');
-    setPhone('9876543210');
-    setAuthMethod('phone');
-    toast('Filled Firebase test phone: +91 98765 43210 (Code: 123456)', 'info');
   };
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-5">
-      {/* Invisible Recaptcha target */}
-      <div id="root-recaptcha-container"></div>
+    <div className="w-full max-w-md mx-auto space-y-6">
+      {/* Header Badge */}
+      <div className="text-center space-y-2">
+        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 border border-accent/30 text-accent font-bold shadow-cinema-glow">
+          <Camera className="h-7 w-7" />
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-black text-cinema-text font-heading">
+          {authMethod === 'phone' ? 'Sign In to FlexGear' : 'Administrator Console'}
+        </h1>
+        <p className="text-xs text-cinema-muted">
+          {authMethod === 'phone'
+            ? 'Enter your mobile number to receive a secure SMS OTP'
+            : 'Access inventory management, orders, and customer KYC'}
+        </p>
+      </div>
 
-      {/* Guide modal */}
-      <FirebaseConsoleGuideModal isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
-
-      {/* Firebase Badge & Setup Guide Button */}
-      <div className="p-3.5 rounded-2xl bg-cinema-card border border-cinema-border flex items-center justify-between shadow-2xs">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-accent/15 text-accent flex items-center justify-center shrink-0 border border-accent/30">
-            <Sparkles className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="text-xs font-black text-cinema-text flex items-center gap-1.5">
-              <span>Firebase Authentication</span>
-              <span className="text-[10px] bg-accent/20 text-accent font-bold px-1.5 py-0.2 rounded-md border border-accent/40">
-                OTP
-              </span>
-            </div>
-            <p className="text-[11px] text-cinema-muted">
-              Live SMS &amp; Test Numbers via Firebase Console
-            </p>
-          </div>
+      {/* Main Card */}
+      <div className="rounded-3xl border border-cinema-border bg-cinema-surface p-6 sm:p-8 space-y-6 shadow-cinema-xl">
+        {/* Method Switcher Tabs */}
+        <div className="grid grid-cols-2 p-1 rounded-2xl bg-cinema-elevated border border-cinema-border">
+          <button
+            type="button"
+            onClick={() => {
+              setAuthMethod('phone');
+              setStep('phone_entry');
+            }}
+            className={`py-2 text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 ${
+              authMethod === 'phone'
+                ? 'bg-accent text-cinema-bg shadow-cinema-accent font-black'
+                : 'text-cinema-muted hover:text-cinema-text'
+            }`}
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <span>Mobile OTP</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setAuthMethod('password')}
+            className={`py-2 text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 ${
+              authMethod === 'password'
+                ? 'bg-accent text-cinema-bg shadow-cinema-accent font-black'
+                : 'text-cinema-muted hover:text-cinema-text'
+            }`}
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>Admin / Staff</span>
+          </button>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsGuideOpen(true)}
-          className="px-2.5 py-1.5 rounded-xl bg-cinema-elevated hover:bg-cinema-border text-cinema-text text-[11px] font-bold border border-cinema-border shadow-2xs transition flex items-center gap-1 cursor-pointer"
-        >
-          <HelpCircle className="w-3.5 h-3.5 text-accent" />
-          <span>Console Guide</span>
-        </button>
-      </div>
-
-      {/* Method Tabs: Phone OTP vs Password */}
-      <div className="grid grid-cols-2 gap-2 p-1.5 rounded-2xl border border-cinema-border bg-cinema-card shadow-2xs">
-        <button
-          type="button"
-          onClick={() => {
-            setAuthMethod('phone');
-            setStep('phone_entry');
-          }}
-          className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            authMethod === 'phone'
-              ? 'bg-accent text-cinema-bg shadow-xs font-black'
-              : 'text-cinema-muted hover:text-cinema-text'
-          }`}
-        >
-          <Smartphone className="h-4 w-4" />
-          <span>Phone OTP (Firebase)</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setAuthMethod('password')}
-          className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            authMethod === 'password'
-              ? 'bg-accent text-cinema-bg shadow-xs font-black'
-              : 'text-cinema-muted hover:text-cinema-text'
-          }`}
-        >
-          <Lock className="h-4 w-4" />
-          <span>Password / Admin</span>
-        </button>
-      </div>
-
-      {/* Main Form Card */}
-      <div className="rounded-3xl border border-cinema-border bg-cinema-card p-6 sm:p-8 shadow-cinema space-y-5">
-        {authMethod === 'phone' ? (
-          <div>
+        {/* 1. Customer Phone OTP Flow */}
+        {authMethod === 'phone' && (
+          <>
             {step === 'phone_entry' ? (
               <form onSubmit={handleSendPhoneOtp} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-cinema-text flex items-center gap-1.5">
-                    <Smartphone className="h-3.5 w-3.5 text-accent" />
-                    <span>Mobile Phone Number</span>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-cinema-text flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Smartphone className="h-3.5 w-3.5 text-accent" />
+                      <span>Mobile Number</span>
+                    </span>
+                    <span className="text-[10px] text-cinema-muted font-normal">India (+91)</span>
                   </label>
 
-                  <div className="flex gap-2">
-                    <select
-                      value={countryCode}
-                      onChange={(e) => setCountryCode(e.target.value)}
-                      className="w-32 rounded-xl border border-cinema-border bg-cinema-elevated px-2 text-xs font-semibold text-cinema-text focus:border-accent focus:outline-none"
-                    >
-                      {COUNTRY_CODES.map((item) => (
-                        <option key={item.code} value={item.code} className="bg-cinema-card text-cinema-text">
-                          {item.label}
-                        </option>
-                      ))}
-                    </select>
-
-                    <div className="relative flex-1">
-                      <Input
-                        type="tel"
-                        required
-                        placeholder="98765 43210"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                        className="rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text font-semibold focus:border-accent"
-                      />
-                    </div>
+                  <div className="relative flex items-center">
+                    <span className="absolute left-3.5 text-xs text-cinema-muted font-bold font-mono">
+                      +91
+                    </span>
+                    <Input
+                      type="tel"
+                      required
+                      autoFocus
+                      placeholder="98765 43210"
+                      maxLength={10}
+                      value={phone}
+                      onChange={(e) => setPhone(cleanPhone(e.target.value))}
+                      className="pl-13 h-12 rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text font-mono text-sm tracking-wider focus:border-accent"
+                    />
                   </div>
                   <p className="text-[11px] text-cinema-muted">
-                    Firebase will dispatch a 6-digit OTP code to verify your account.
+                    We will send a 6-digit verification code to your phone.
                   </p>
-                </div>
-
-                {/* Test phone filler helper */}
-                <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/30 text-[11px] text-accent flex items-center justify-between">
-                  <span className="flex items-center gap-1">
-                    <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />
-                    <span>Firebase Test: <strong>+91 9876543210</strong></span>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={fillTestPhone}
-                    className="px-2 py-0.5 bg-accent hover:bg-accent-hover text-cinema-bg font-black rounded-md transition cursor-pointer"
-                  >
-                    Fill
-                  </button>
                 </div>
 
                 <Button
                   type="submit"
-                  disabled={isSendingOtp || phone.length < 7}
-                  className="w-full h-11 text-xs font-black bg-accent hover:bg-accent-hover text-cinema-bg rounded-2xl shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                  disabled={isSendingOtp || phone.length < 10}
+                  className="w-full h-12 rounded-xl bg-accent hover:bg-accent-hover text-cinema-bg font-black text-xs uppercase tracking-wider shadow-cinema-accent flex items-center justify-center gap-2 cursor-pointer transition active:scale-98"
                 >
                   {isSendingOtp ? (
                     <>
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      <span>Sending Firebase OTP...</span>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Sending OTP...</span>
                     </>
                   ) : (
                     <>
                       <span>Send Verification OTP</span>
-                      <ArrowRight className="h-4 w-4" />
+                      <ArrowRight className="w-4 h-4" />
                     </>
                   )}
                 </Button>
               </form>
             ) : (
+              /* OTP 6-Digit Verification Step */
               <form onSubmit={handleVerifyPhoneOtp} className="space-y-5">
-                <div className="text-center space-y-1">
-                  <div className="text-xs font-bold text-cinema-text">
-                    Enter 6-Digit Code Sent To
+                <div className="space-y-2 text-center">
+                  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-cinema-text">
+                    <span>Code sent to:</span>
+                    <span className="font-mono text-accent">+91 {phone}</span>
                   </div>
-                  <div className="text-sm font-black text-accent font-mono">
-                    {formatE164(phone, countryCode)}
-                  </div>
+                  <p className="text-[11px] text-cinema-muted">
+                    Enter the 6-digit verification code below
+                  </p>
                 </div>
 
-                <div
-                  className="flex justify-center gap-2 py-1"
-                  onPaste={handlePasteOtp}
-                >
+                {/* 6-Box OTP Input */}
+                <div className="flex justify-between gap-2" onPaste={handlePasteOtp}>
                   {otpDigits.map((digit, idx) => (
                     <input
                       key={idx}
@@ -493,168 +380,132 @@ export function FirebaseOtpLoginForm({
                       value={digit}
                       onChange={(e) => handleDigitChange(idx, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(idx, e)}
-                      className="h-12 w-10 sm:h-13 sm:w-11 text-center text-xl font-black rounded-xl border-2 border-cinema-border bg-cinema-elevated text-cinema-text focus:border-accent focus:bg-cinema-card focus:outline-none transition-all"
+                      className="w-11 h-12 text-center rounded-xl bg-cinema-elevated border border-cinema-border text-cinema-text font-mono font-black text-lg focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none transition"
                     />
                   ))}
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/30 text-center text-[11px] text-accent">
-                  Firebase Test OTP: <strong className="font-mono text-accent-light font-bold">123456</strong>
-                </div>
-
-                <div className="flex items-center justify-between text-xs pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setStep('phone_entry')}
-                    className="text-cinema-muted hover:text-cinema-text flex items-center gap-1 font-semibold cursor-pointer"
-                  >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>Edit Phone</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSendPhoneOtp()}
-                    disabled={cooldown > 0 || isSendingOtp}
-                    className={`flex items-center gap-1 font-bold cursor-pointer ${
-                      cooldown > 0
-                        ? 'text-cinema-muted cursor-not-allowed'
-                        : 'text-accent hover:underline'
-                    }`}
-                  >
-                    <RefreshCw className={`h-3 w-3 ${isSendingOtp ? 'animate-spin' : ''}`} />
-                    <span>{cooldown > 0 ? `Resend (${cooldown}s)` : 'Resend OTP'}</span>
-                  </button>
-                </div>
-
+                {/* Verify Button */}
                 <Button
                   type="submit"
                   disabled={isVerifyingOtp || otpDigits.join('').length !== 6}
-                  className="w-full h-11 text-xs font-black bg-accent hover:bg-accent-hover text-cinema-bg rounded-2xl shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full h-12 rounded-xl bg-accent hover:bg-accent-hover text-cinema-bg font-black text-xs uppercase tracking-wider shadow-cinema-accent flex items-center justify-center gap-2 cursor-pointer transition active:scale-98"
                 >
                   {isVerifyingOtp ? (
                     <>
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      <span>Verifying Firebase OTP...</span>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Verifying Code...</span>
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>Verify &amp; Sign In</span>
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Verify &amp; Continue</span>
                     </>
                   )}
                 </Button>
+
+                {/* Resend & Change Number Actions */}
+                <div className="flex items-center justify-between text-xs pt-2 border-t border-cinema-border">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('phone_entry');
+                      setOtpDigits(['', '', '', '', '', '']);
+                    }}
+                    className="text-cinema-muted hover:text-cinema-text font-semibold flex items-center gap-1 cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3 h-3" />
+                    <span>Change Phone</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={cooldown > 0 || isSendingOtp}
+                    onClick={() => handleSendPhoneOtp()}
+                    className={`font-bold transition cursor-pointer ${
+                      cooldown > 0 ? 'text-cinema-muted cursor-not-allowed' : 'text-accent hover:underline'
+                    }`}
+                  >
+                    {cooldown > 0 ? `Resend code in ${cooldown}s` : 'Resend OTP'}
+                  </button>
+                </div>
               </form>
             )}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-cinema-elevated border border-cinema-border">
-              <button
-                type="button"
-                onClick={() => switchRole('customer')}
-                className={`py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                  roleTab === 'customer'
-                    ? 'bg-cinema-card text-cinema-text shadow-2xs'
-                    : 'text-cinema-muted hover:text-cinema-text'
-                }`}
-              >
-                Customer Login
-              </button>
-              <button
-                type="button"
-                onClick={() => switchRole('admin')}
-                className={`py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                  roleTab === 'admin'
-                    ? 'bg-cinema-card text-accent shadow-2xs'
-                    : 'text-cinema-muted hover:text-cinema-text'
-                }`}
-              >
-                Admin Portal
-              </button>
+          </>
+        )}
+
+        {/* 2. Admin / Password Login Flow */}
+        {authMethod === 'password' && (
+          <form onSubmit={handlePasswordLogin} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-cinema-text flex items-center gap-1.5">
+                <Mail className="h-3.5 w-3.5 text-accent" />
+                <span>Admin Email Address</span>
+              </label>
+              <Input
+                type="email"
+                required
+                placeholder="admin@flexgear.test"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-11 rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text text-xs"
+              />
             </div>
 
-            <form onSubmit={handlePasswordLogin} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-cinema-text flex items-center gap-1.5">
-                  <Mail className="h-3.5 w-3.5 text-accent" />
-                  <span>Email Address</span>
-                </label>
-                <Input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text focus:border-accent"
-                />
-              </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-cinema-text flex items-center gap-1.5">
+                <Lock className="h-3.5 w-3.5 text-accent" />
+                <span>Password</span>
+              </label>
+              <Input
+                type="password"
+                required
+                placeholder="••••••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-11 rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text text-xs"
+              />
+            </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-cinema-text flex items-center gap-1.5">
-                  <Lock className="h-3.5 w-3.5 text-accent" />
-                  <span>Password</span>
-                </label>
-                <Input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="rounded-xl border-cinema-border bg-cinema-elevated text-cinema-text focus:border-accent"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full h-11 text-xs font-black bg-accent hover:bg-accent-hover text-cinema-bg rounded-2xl shadow-sm flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Sign In with Password</span>
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </form>
-          </div>
+            <Button
+              type="submit"
+              disabled={isLoggingInPassword || !email || !password}
+              className="w-full h-11 rounded-xl bg-accent hover:bg-accent-hover text-cinema-bg font-black text-xs uppercase tracking-wider shadow-cinema-accent flex items-center justify-center gap-2 cursor-pointer mt-2"
+            >
+              {isLoggingInPassword ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>Signing In...</span>
+                </>
+              ) : (
+                <>
+                  <Shield className="w-4 h-4" />
+                  <span>Authorize Admin Access</span>
+                </>
+              )}
+            </Button>
+          </form>
         )}
-
-        {/* 1-Click Demo Profiles */}
-        <div className="border-t border-cinema-border pt-4 space-y-2">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-cinema-muted text-center">
-            Quick 1-Click Demo Profiles
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => handleInstantLogin('customer')}
-              className="p-2.5 rounded-xl border border-cinema-border bg-cinema-elevated hover:bg-cinema-border hover:border-accent/50 text-xs font-bold text-cinema-text transition cursor-pointer"
-            >
-              🎬 Demo Customer
-            </button>
-            <button
-              type="button"
-              onClick={() => handleInstantLogin('admin')}
-              className="p-2.5 rounded-xl border border-cinema-border bg-cinema-elevated hover:bg-cinema-border hover:border-accent/50 text-xs font-bold text-cinema-text transition cursor-pointer"
-            >
-              ⚡ Demo Admin
-            </button>
-          </div>
-        </div>
       </div>
 
-      {/* Explore or Signup footer */}
-      <div className="flex items-center justify-between text-xs text-cinema-muted px-2">
-        <Link href="/signup" className="text-accent font-bold hover:underline">
-          Create New Account
-        </Link>
-
-        {showExploreOption && onExploreClick && (
-          <button
-            type="button"
-            onClick={onExploreClick}
-            className="text-cinema-text hover:text-accent font-bold underline cursor-pointer"
-          >
-            Explore Catalog as Guest →
-          </button>
-        )}
+      {/* Footer Links */}
+      <div className="text-center text-xs text-cinema-muted space-y-2">
+        <div>
+          By signing in, you agree to FlexGear&apos;s{' '}
+          <Link href="/privacy" className="text-cinema-text font-semibold hover:underline">
+            Rental Terms &amp; Privacy Policy
+          </Link>
+        </div>
+        <div>
+          New to FlexGear?{' '}
+          <Link href="/signup" className="text-accent font-bold hover:underline">
+            Create Filmmaker Account →
+          </Link>
+        </div>
       </div>
     </div>
   );
 }
+
+// Re-export alias for clean naming
+export { FirebaseOtpLoginForm as SupabaseOtpLoginForm };

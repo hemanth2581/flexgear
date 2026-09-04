@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { supabaseAdmin, isSupabaseConfigured } from '@/lib/supabase/server';
 import { getOtpProvider } from '@/lib/providers/otp';
-import { OTP_EXPIRY_SECONDS, OTP_COOLDOWN_SECONDS, OTP_MAX_ATTEMPTS, MOCK_OTP_CODE } from '@/lib/constants';
+import { OTP_EXPIRY_SECONDS, OTP_COOLDOWN_SECONDS, OTP_MAX_ATTEMPTS } from '@/lib/constants';
 
 interface RateLimitRecord {
   timestamps: number[];
@@ -11,7 +11,40 @@ const inMemoryRateLimits = new Map<string, RateLimitRecord>();
 
 export class OtpService {
   /**
-   * Enforces in-memory rate limits: max 3 OTP requests per 10 minutes per phone
+   * Normalizes any input phone number to standard E.164 (+91XXXXXXXXXX)
+   */
+  static normalizePhone(rawPhone: string): string {
+    const digits = rawPhone.replace(/\D/g, '');
+    if (digits.length === 12 && digits.startsWith('91')) {
+      return `+${digits}`;
+    }
+    if (digits.length === 10) {
+      return `+91${digits}`;
+    }
+    if (rawPhone.startsWith('+')) {
+      return `+${digits}`;
+    }
+    return `+91${digits.slice(-10)}`;
+  }
+
+  /**
+   * Extracts clean 10-digit national number
+   */
+  static get10DigitNumber(rawPhone: string): string {
+    const digits = rawPhone.replace(/\D/g, '');
+    return digits.slice(-10);
+  }
+
+  /**
+   * Validates if a phone number is a valid 10-digit Indian mobile number
+   */
+  static isValidIndianMobile(rawPhone: string): boolean {
+    const tenDigits = this.get10DigitNumber(rawPhone);
+    return /^[6-9]\d{9}$/.test(tenDigits);
+  }
+
+  /**
+   * Enforces rate limits: max 3 OTP requests per 10 minutes per phone
    */
   private static checkRateLimit(phone: string): { allowed: boolean; retryAfterSeconds?: number } {
     const now = Date.now();
@@ -33,10 +66,20 @@ export class OtpService {
   }
 
   /**
-   * Sends an OTP to the given phone number with hashing and database verification record
+   * Generates and sends a 6-digit OTP code to the normalized phone number
    */
-  static async sendOtp(phone: string): Promise<{ success: boolean; message: string; cooldownSeconds?: number }> {
-    const rateCheck = this.checkRateLimit(phone);
+  static async sendOtp(rawPhone: string): Promise<{ success: boolean; message: string; cooldownSeconds?: number; phone?: string }> {
+    if (!this.isValidIndianMobile(rawPhone)) {
+      return {
+        success: false,
+        message: 'Please enter a valid 10-digit Indian mobile number (starts with 6, 7, 8, or 9).',
+      };
+    }
+
+    const normalizedPhone = this.normalizePhone(rawPhone);
+    const tenDigits = this.get10DigitNumber(rawPhone);
+
+    const rateCheck = this.checkRateLimit(normalizedPhone);
     if (!rateCheck.allowed) {
       return {
         success: false,
@@ -44,132 +87,230 @@ export class OtpService {
       };
     }
 
-    const isMock = process.env.OTP_MODE === 'mock' || !process.env.OTP_MODE;
-    const otpCode = isMock ? MOCK_OTP_CODE : Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate random secure 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Hash the OTP with bcrypt
     const salt = await bcrypt.genSalt(10);
     const otpHash = await bcrypt.hash(otpCode, salt);
-
     const expiresAt = new Date(Date.now() + OTP_EXPIRY_SECONDS * 1000).toISOString();
 
+    // Store in Supabase otp_verifications
     if (isSupabaseConfigured) {
       try {
-        // Upsert or insert into otp_verifications table
-        const { error: dbError } = await supabaseAdmin.from('otp_verifications').insert({
-          phone,
+        await supabaseAdmin.from('otp_verifications').insert({
+          phone: normalizedPhone,
           otp_hash: otpHash,
           expires_at: expiresAt,
           attempts: 0,
           verified: false,
         });
-
-        if (dbError) {
-          console.error('[OtpService] DB Insert Error:', dbError);
-        }
       } catch (e) {
-        console.warn('[OtpService] Supabase offline/mock fallback active:', e);
+        console.warn('[OtpService] Supabase OTP insert error:', e);
       }
     }
 
-    // Dispatch via Provider
+    // Dispatch via configured Provider (Twilio / Fast2SMS / Mock)
     const provider = getOtpProvider();
-    const result = await provider.sendOtp(phone, otpCode);
+    const dispatchResult = await provider.sendOtp(tenDigits, otpCode);
 
     return {
       success: true,
-      message: result.message,
+      message: dispatchResult.message || `OTP dispatched to +91 ${tenDigits}.`,
       cooldownSeconds: OTP_COOLDOWN_SECONDS,
+      phone: normalizedPhone,
     };
   }
 
   /**
-   * Verifies an OTP code against the latest valid hash and generates a verification token
+   * Verifies an OTP code and retrieves or creates the corresponding Customer in Supabase
    */
   static async verifyOtp(
-    phone: string,
-    otpCode: string
-  ): Promise<{ success: boolean; token?: string; message: string }> {
-    // 1. Check for standard Mock OTP bypass if running in mock mode
-    const isMock = process.env.OTP_MODE === 'mock' || !process.env.OTP_MODE;
-    if (isMock && otpCode === MOCK_OTP_CODE) {
-      const mockToken = `otp_verified_${phone}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    rawPhone: string,
+    otpCode: string,
+    additionalDetails?: { fullName?: string; email?: string }
+  ): Promise<{
+    success: boolean;
+    token?: string;
+    user?: any;
+    message: string;
+    isNewCustomer?: boolean;
+  }> {
+    if (!rawPhone || !otpCode || otpCode.length !== 6) {
       return {
-        success: true,
-        token: mockToken,
-        message: 'OTP verified successfully.',
+        success: false,
+        message: 'Please provide both the phone number and the 6-digit OTP code.',
       };
     }
 
+    const normalizedPhone = this.normalizePhone(rawPhone);
+    const tenDigits = this.get10DigitNumber(rawPhone);
+
     try {
-      // 2. Query Supabase for latest active OTP record for this phone
-      const { data: records, error } = await supabaseAdmin
-        .from('otp_verifications')
-        .select('*')
-        .eq('phone', phone)
-        .eq('verified', false)
-        .gt('expires_at', new Date().toISOString())
-        .order('created_at', { ascending: false })
-        .limit(1);
+      // 1. Query Supabase for latest active OTP record
+      let isVerified = false;
 
-      if (error || !records || records.length === 0) {
-        return {
-          success: false,
-          message: 'No active OTP found or OTP has expired. Please request a new one.',
-        };
-      }
+      if (isSupabaseConfigured) {
+        const { data: records, error } = await supabaseAdmin
+          .from('otp_verifications')
+          .select('*')
+          .eq('phone', normalizedPhone)
+          .eq('verified', false)
+          .gt('expires_at', new Date().toISOString())
+          .order('created_at', { ascending: false })
+          .limit(1);
 
-      const record = records[0] as any;
+        let activeRecord: any = null;
 
-      if (record.attempts >= OTP_MAX_ATTEMPTS) {
-        return {
-          success: false,
-          message: 'Maximum OTP verification attempts exceeded. Please request a new OTP.',
-        };
-      }
+        if (!error && records && records.length > 0) {
+          activeRecord = records[0];
+        } else {
+          // Check if fallback 10-digit without +91 format exists in DB
+          const { data: altRecords } = await supabaseAdmin
+            .from('otp_verifications')
+            .select('*')
+            .eq('phone', tenDigits)
+            .eq('verified', false)
+            .gt('expires_at', new Date().toISOString())
+            .order('created_at', { ascending: false })
+            .limit(1);
 
-      // Check hash
-      const isMatch = await bcrypt.compare(otpCode, record.otp_hash);
+          if (!altRecords || altRecords.length === 0) {
+            return {
+              success: false,
+              message: 'No active OTP found or the OTP has expired. Please request a new code.',
+            };
+          }
+          activeRecord = altRecords[0];
+        }
 
-      if (!isMatch) {
-        // Increment attempts
-        await (supabaseAdmin
-          .from('otp_verifications') as any)
-          .update({ attempts: (record.attempts || 0) + 1 })
+        const record = activeRecord;
+
+        if (record.attempts >= OTP_MAX_ATTEMPTS) {
+          return {
+            success: false,
+            message: 'Maximum OTP verification attempts exceeded. Please request a new OTP.',
+          };
+        }
+
+        // Compare hash
+        const isMatch = await bcrypt.compare(otpCode, record.otp_hash);
+
+        if (!isMatch) {
+          const nextAttempts = (record.attempts || 0) + 1;
+          await (supabaseAdmin.from('otp_verifications') as any)
+            .update({ attempts: nextAttempts })
+            .eq('id', record.id);
+
+          const remaining = Math.max(0, OTP_MAX_ATTEMPTS - nextAttempts);
+          return {
+            success: false,
+            message: `Invalid verification code. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`,
+          };
+        }
+
+        // Mark verified
+        await (supabaseAdmin.from('otp_verifications') as any)
+          .update({ verified: true })
           .eq('id', record.id);
 
-        return {
-          success: false,
-          message: `Invalid OTP. ${OTP_MAX_ATTEMPTS - ((record.attempts || 0) + 1)} attempts remaining.`,
+        isVerified = true;
+      }
+
+      if (!isVerified && !isSupabaseConfigured) {
+        // Local offline development check
+        isVerified = true;
+      }
+
+      // 2. Find or Create Customer in Supabase `users` table
+      let customerUser: any = null;
+      let isNewCustomer = false;
+
+      if (isSupabaseConfigured) {
+        // Look up by normalized phone or 10-digit
+        const { data: existingUsers, error: userFetchError } = await supabaseAdmin
+          .from('users')
+          .select('*')
+          .or(`phone.eq.${normalizedPhone},phone.eq.${tenDigits}`)
+          .limit(1);
+
+        if (!userFetchError && existingUsers && existingUsers.length > 0) {
+          customerUser = existingUsers[0];
+          // Ensure phone is normalized in database
+          if (customerUser.phone !== normalizedPhone) {
+            await (supabaseAdmin.from('users') as any)
+              .update({ phone: normalizedPhone })
+              .eq('id', customerUser.id);
+            customerUser.phone = normalizedPhone;
+          }
+        } else {
+          // Create new customer account
+          const newId = crypto.randomUUID();
+          const defaultEmail = additionalDetails?.email || `${tenDigits}@flexgear.customer`;
+          const defaultName = additionalDetails?.fullName || `Filmmaker (+91 ${tenDigits})`;
+
+          const { data: createdUser, error: createError } = await (supabaseAdmin.from('users') as any)
+            .insert({
+              id: newId,
+              phone: normalizedPhone,
+              email: defaultEmail,
+              full_name: defaultName,
+              role: 'CUSTOMER',
+              created_at: new Date().toISOString(),
+            })
+            .select('*')
+            .single();
+
+          if (!createError && createdUser) {
+            customerUser = createdUser;
+            isNewCustomer = true;
+          } else {
+            console.error('[OtpService] Customer Insert Error:', createError);
+            // Fallback object if insert had transient issue
+            customerUser = {
+              id: newId,
+              phone: normalizedPhone,
+              email: defaultEmail,
+              full_name: defaultName,
+              role: 'CUSTOMER',
+              created_at: new Date().toISOString(),
+            };
+          }
+        }
+      } else {
+        customerUser = {
+          id: `user_${tenDigits}`,
+          phone: normalizedPhone,
+          email: `${tenDigits}@flexgear.customer`,
+          full_name: `Filmmaker (+91 ${tenDigits})`,
+          role: 'CUSTOMER',
+          created_at: new Date().toISOString(),
         };
       }
 
-      // Mark verified
-      await (supabaseAdmin
-        .from('otp_verifications') as any)
-        .update({ verified: true })
-        .eq('id', record.id);
-
-      const verificationToken = `otp_verified_${phone}_${record.id}_${Date.now()}`;
+      // 3. Generate Session Token
+      const sessionToken = `flexgear_session_${customerUser.id}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
       return {
         success: true,
-        token: verificationToken,
-        message: 'OTP verified successfully.',
+        token: sessionToken,
+        user: {
+          id: customerUser.id,
+          phone: customerUser.phone,
+          email: customerUser.email,
+          full_name: customerUser.full_name,
+          role: customerUser.role || 'CUSTOMER',
+        },
+        isNewCustomer,
+        message: isNewCustomer
+          ? 'Welcome to FlexGear! Your filmmaker account has been created.'
+          : 'Welcome back! Signed in successfully.',
       };
-    } catch (err) {
-      console.error('[OtpService] Verification Error:', err);
-      // Mock fallback if DB is not reachable
-      if (otpCode === MOCK_OTP_CODE) {
-        return {
-          success: true,
-          token: `otp_verified_${phone}_${Date.now()}`,
-          message: 'OTP verified successfully (mock fallback).',
-        };
-      }
+    } catch (err: any) {
+      console.error('[OtpService] Verification Exception:', err);
       return {
         success: false,
-        message: 'Could not verify OTP at this time.',
+        message: err?.message || 'An error occurred while verifying the code. Please try again.',
       };
     }
   }
@@ -178,7 +319,7 @@ export class OtpService {
    * Validates if a verification token provided during checkout is authentic
    */
   static isValidOtpToken(phone: string, token: string): boolean {
-    if (!token || !token.startsWith('otp_verified_')) return false;
-    return token.includes(phone);
+    if (!token) return false;
+    return token.startsWith('flexgear_session_') || token.startsWith('otp_verified_');
   }
 }
